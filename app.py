@@ -64,9 +64,9 @@ meminimalkan total biaya, dan menganalisis bagaimana perubahan parameter memenga
 # Input dari pengguna di sidebar
 st.sidebar.header("⚙️ Input Parameter Persediaan")
 annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=1000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-# Mengubah nilai default untuk biaya pemesanan dan penyimpanan menjadi bilangan bulat
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
+# Mengubah nilai default untuk biaya pemesanan dan penyimpanan menjadi float agar sesuai dengan min_value
+ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000.0, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000.0, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
 
 # Perhitungan
 if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
@@ -304,7 +304,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
                 sensitivity_data_H.append({"Biaya Penyimpanan (H)": format_rupiah(h_var), "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": format_rupiah(total_cost_var)})
             else:
                 sensitivity_data_H.append({"Biaya Penyimpanan (H)": format_rupiah(h_var), "EOQ": "Tak Terhingga", "Total Biaya": "Tak Terhingga"})
-        df_sensitivity_H = pd.DataFrame(sensitivity_H)
+        df_sensitivity_H = pd.DataFrame(sensitivity_data_H)
         st.dataframe(df_sensitivity_H)
 
     st.markdown("---") # Garis pemisah
