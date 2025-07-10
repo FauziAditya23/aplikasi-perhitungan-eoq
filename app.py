@@ -159,7 +159,6 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
             if total_cost_custom > total_cost_at_eoq:
                 st.warning(f"⚠️ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih tinggi dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}).")
             elif total_cost_custom < total_cost_at_eoq:
-                # FIX: Corrected format_cost_custom to format_rupiah(total_cost_custom)
                 st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih rendah dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}). Ini mungkin karena pembulatan atau nilai yang sangat dekat.")
             else:
                 st.info("ℹ️ Total biaya kustom sama dengan total biaya pada EOQ.")
@@ -284,6 +283,8 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
             Z\text{-score} = \text{Nilai dari distribusi normal standar}
         ''')
         st.markdown(f"Untuk tingkat layanan {service_level_percent}%, Z-score adalah sekitar {z_score:,.2f}.")
+        # FIX: Corrected the LaTeX string for Z-score to avoid NameError
+        st.latex(fr'''\text{{Z-score}} = {z_score:,.2f}''')
         st.latex(r'''
             \text{Safety Stock} = Z\text{-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}
         ''')
