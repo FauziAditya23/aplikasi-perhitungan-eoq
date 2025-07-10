@@ -62,8 +62,8 @@ def calculate_orders_per_year(D, Q):
 st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
 
 # --- Header Utama Aplikasi ---
-st.title("📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)")
-st.subheader("Studi Kasus: Kedai Kopi 'Kopi Kita'")
+st.markdown("<h1 style='text-align: center; color: #2E86C1;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #5D6D7E;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True)
 
 st.markdown("""
 Selamat datang di alat simulasi interaktif untuk **Economic Order Quantity (EOQ)** dan **Reorder Point (ROP)**!
@@ -88,14 +88,14 @@ with col1:
     # Menggunakan expander untuk parameter input agar tampilan lebih rapi
     with st.expander("Konfigurasi Parameter Model ⚙️", expanded=True):
         with st.container(border=True):
-            st.header("⚙️ Parameter Model Input")
+            st.markdown("<h4>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
             # Nilai default dipertahankan dari versi sebelumnya
-            D = st.number_input("Permintaan Tahunan (kg) �", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
+            D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
             S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
             H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=500, help="Biaya untuk menyimpan satu kg biji kopi selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
             
             st.markdown("---") # Pemisah dalam container
-            st.subheader("🛡️ Parameter Stok Pengaman & ROP")
+            st.markdown("<h4>🛡️ Parameter Stok Pengaman & ROP</h4>", unsafe_allow_html=True)
             lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=7, help="Jumlah hari antara pemesanan dan penerimaan biji kopi.")
             safety_stock = st.number_input("Stok Pengaman (Safety Stock) (kg) 🚨", min_value=0, value=20, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan pengiriman.")
     
