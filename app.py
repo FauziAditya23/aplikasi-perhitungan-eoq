@@ -348,18 +348,19 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
     fig, ax = plt.subplots(figsize=(10, 6))
     
     # Reorder plot calls to match the desired legend order: Biaya Penyimpanan, Biaya Pemesanan, Total Biaya
-    ax.plot(q_values, holding_costs_plot, label="Biaya Penyimpanan", color='#4682B4') # SteelBlue
-    ax.plot(q_values, ordering_costs_plot, label="Biaya Pemesanan", color='#32CD32') # LimeGreen (changed to green for consistency with image)
-    ax.plot(q_values, total_costs_plot, label="Total Biaya", color='red', linewidth=2) # Red for Total Biaya
+    ax.plot(q_values, holding_costs_plot, label="Biaya Penyimpanan", color='blue') # Blue for Holding Cost
+    ax.plot(q_values, ordering_costs_plot, label="Biaya Pemesanan", color='green') # Green for Ordering Cost
+    ax.plot(q_values, total_costs_plot, label="Total Biaya", color='red', linewidth=2) # Red for Total Cost
 
     if np.isfinite(eoq) and eoq > 0:
-        ax.axvline(eoq, color='purple', linestyle='--', label=f'EOQ') # Changed color to purple for consistency with image
+        ax.axvline(eoq, color='purple', linestyle='--', label=f'EOQ') # Purple dashed line for EOQ
         # Add annotation for lowest cost point
         if np.isfinite(total_cost_at_eoq):
             ax.annotate(f'Biaya Terendah\n{format_rupiah(total_cost_at_eoq)}',
                         xy=(eoq, total_cost_at_eoq),
-                        xytext=(eoq + max_q_value * 0.15, total_cost_at_eoq + total_cost_at_eoq * 0.1), # Adjusted text position
-                        arrowprops=dict(facecolor='black', shrink=0.05),
+                        # Adjust xytext and arrowprops for better positioning and appearance
+                        xytext=(eoq + max_q_value * 0.15, total_cost_at_eoq + total_cost_at_eoq * 0.1),
+                        arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=8, headlength=8),
                         horizontalalignment='left', verticalalignment='bottom',
                         bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=0.5, alpha=0.9))
     
@@ -370,7 +371,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
     ax.set_ylabel("Biaya Tahunan (Rp)") # Changed label to match image
     ax.set_title("Analisis Biaya Persediaan (EOQ)") # Changed title to match image
     ax.legend()
-    ax.grid(True, linestyle='--', alpha=0.7)
+    ax.grid(True, linestyle='-', alpha=0.7) # Changed grid style to solid line
     ax.set_ylim(bottom=0) # Memastikan sumbu y dimulai dari 0
     st.pyplot(fig)
 
@@ -387,7 +388,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
     st.markdown("---") # Garis pemisah
 
     # Menggunakan expander untuk analisis sensitivitas
-    with st.expander("� Lakukan Analisis Sensitivitas"):
+    with st.expander("🔬 Lakukan Analisis Sensitivitas"):
         st.write("Lihat bagaimana EOQ dan biaya total berubah jika salah satu parameter bervariasi.")
 
         st.markdown("#### Sensitivitas terhadap Permintaan Tahunan (D)")
