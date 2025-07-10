@@ -115,6 +115,15 @@ parameter permintaan, biaya pemesanan, biaya penyimpanan, waktu tunggu, dan stok
 main_col_input, main_col_explanation = st.columns([1.5, 2])
 
 with main_col_input:
+    st.markdown("""
+    <div style="font-size: 1.1em;">
+    <strong>Model Economic Order Quantity (EOQ):</strong>
+    Model ini membantu Anda menentukan jumlah pesanan yang paling efisien untuk meminimalkan total biaya persediaan,
+    yang mencakup biaya pemesanan dan biaya penyimpanan. Dengan EOQ, Anda dapat mengoptimalkan kapan dan berapa banyak
+    barang yang harus dipesan.
+    </div>
+    """, unsafe_allow_html=True)
+    
     with st.container(border=True):
         st.markdown("<h4>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
         D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=D_default, help="Jumlah total unit barang yang dibutuhkan dalam setahun.")
