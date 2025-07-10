@@ -5,6 +5,7 @@ import pandas as pd # Untuk tampilan tabel
 from scipy.stats import norm # Untuk perhitungan Z-score yang lebih akurat
 import math # Import modul math untuk fungsi sqrt
 
+# --- Fungsi Pembantu ---
 def format_rupiah(value):
     """
     Memformat nilai numerik ke dalam format Rupiah dengan pemisah ribuan.
@@ -57,8 +58,10 @@ def calculate_orders_per_year(D, Q):
 # Fungsi calculate_safety_stock dan calculate_reorder_point tidak digunakan
 # karena safety_stock adalah input langsung dalam antarmuka ini.
 
+# --- Konfigurasi Halaman Streamlit ---
 st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
 
+# --- Header Utama Aplikasi ---
 st.title("📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)")
 st.subheader("Studi Kasus: Kedai Kopi 'Kopi Kita'")
 
@@ -70,8 +73,10 @@ sambil memastikan ketersediaan stok yang memadai. Mari kita optimalkan rantai pa
 
 st.divider() # Garis pemisah visual
 
+# --- Tata Letak Kolom ---
 col1, col2 = st.columns([1.5, 2])
 
+# --- Kolom Input Parameter (col1) ---
 with col1:
     st.markdown("""
     **Skenario Bisnis:**
@@ -80,17 +85,19 @@ with col1:
     yang mencakup biaya pemesanan dan biaya penyimpanan.
     """)
     
-    with st.container(border=True):
-        st.header("⚙️ Parameter Model Input")
-        # Nilai default diubah untuk menghasilkan grafik yang lebih jelas
-        D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
-        S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
-        H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=500, help="Biaya untuk menyimpan satu kg biji kopi selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
-        
-        st.markdown("---") # Pemisah dalam container
-        st.subheader("🛡️ Parameter Stok Pengaman & ROP")
-        lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=7, help="Jumlah hari antara pemesanan dan penerimaan biji kopi.")
-        safety_stock = st.number_input("Stok Pengaman (Safety Stock) (kg) 🚨", min_value=0, value=20, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan pengiriman.")
+    # Menggunakan expander untuk parameter input agar tampilan lebih rapi
+    with st.expander("Konfigurasi Parameter Model ⚙️", expanded=True):
+        with st.container(border=True):
+            st.header("⚙️ Parameter Model Input")
+            # Nilai default dipertahankan dari versi sebelumnya
+            D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
+            S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
+            H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=500, help="Biaya untuk menyimpan satu kg biji kopi selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
+            
+            st.markdown("---") # Pemisah dalam container
+            st.subheader("🛡️ Parameter Stok Pengaman & ROP")
+            lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=7, help="Jumlah hari antara pemesanan dan penerimaan biji kopi.")
+            safety_stock = st.number_input("Stok Pengaman (Safety Stock) (kg) 🚨", min_value=0, value=20, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan pengiriman.")
     
     with st.expander("📚 Penjelasan Rumus Model: Economic Order Quantity (EOQ)"):
         st.markdown("""
@@ -113,9 +120,8 @@ with col1:
         st.latex(r'''ROP = (\text{Permintaan Harian}) \times \text{Lead Time} + \text{Stok Pengaman}''')
         st.latex(r''' TC = \left(\frac{D}{Q}\right)S + \left(\frac{Q}{2}\right)H ''')
 
-# Perhitungan utama berdasarkan input
-# Perhitungan ini akan dijalankan setiap kali input berubah, tetapi hasilnya hanya ditampilkan
-# setelah tombol "Hitung" ditekan.
+# --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk plot awal jika diinginkan,
+#     tetapi tampilan hasil diatur oleh tombol) ---
 if H > 0 and D > 0:
     eoq = calculate_eoq(D, S, H)
     frekuensi_pesanan = D / eoq if eoq > 0 else 0
@@ -132,7 +138,7 @@ else:
     siklus_pemesanan = 0
     frekuensi_pesanan = 0
 
-# Tombol untuk memicu perhitungan dan tampilan hasil
+# --- Tombol untuk memicu perhitungan dan tampilan hasil ---
 if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
     with col2:
         st.header("💡 Hasil dan Wawasan Bisnis")
@@ -366,4 +372,4 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
             """)
 
 st.markdown("---")
-st.markdown("Made with ❤️ using Streamlit.")
+st.markdown("Fauzi Aditya")
