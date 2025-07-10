@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd # Untuk tampilan tabel
 from scipy.stats import norm # Untuk perhitungan Z-score yang lebih akurat
+import math # Import modul math untuk fungsi sqrt
 
 def format_rupiah(value):
     """
@@ -15,430 +16,244 @@ def format_rupiah(value):
         return f"Rp {int(value):,}"
     return f"Rp {value:,.2f}"
 
+# Fungsi-fungsi perhitungan EOQ, Total Cost, dll. (tetap sama)
 def calculate_eoq(D, S, H):
-    """
-    Menghitung Economic Order Quantity (EOQ).
-    D: Permintaan tahunan (unit)
-    S: Biaya pemesanan per pesanan
-    H: Biaya penyimpanan per unit per tahun
-    """
     if H == 0:
-        return float('inf') # Menghindari pembagian dengan nol
+        return float('inf')
     eoq = np.sqrt((2 * D * S) / H)
     return eoq
 
 def calculate_total_inventory_cost(D, S, H, Q):
-    """
-    Menghitung total biaya persediaan.
-    D: Permintaan tahunan (unit)
-    S: Biaya pemesanan per pesanan
-    H: Biaya penyimpanan per unit per tahun
-    Q: Kuantitas pesanan (EOQ atau kuantitas lain)
-    """
-    if Q <= 0 or not np.isfinite(Q): # Mengubah kondisi untuk Q agar tidak nol, negatif, atau tak terhingga
+    if Q <= 0 or not np.isfinite(Q):
         return float('inf'), float('inf'), float('inf')
     ordering_cost = (D / Q) * S
     holding_cost = (Q / 2) * H
     total_cost = ordering_cost + holding_cost
-    return ordering_cost, holding_cost, total_cost # Mengembalikan ketiga nilai
+    return ordering_cost, holding_cost, total_cost
 
 def calculate_orders_per_year(D, Q):
-    """
-    Menghitung jumlah pemesanan per tahun.
-    D: Permintaan tahunan (unit)
-    Q: Kuantitas pesanan (EOQ atau kuantitas lain)
-    """
-    if Q <= 0 or not np.isfinite(Q): # Mengubah kondisi untuk Q agar tidak nol, negatif, atau tak terhingga
+    if Q <= 0 or not np.isfinite(Q):
         return float('inf')
     orders = D / Q
     return orders
 
 def calculate_safety_stock(z_score, std_dev_daily_demand, lead_time_days):
-    """
-    Menghitung Safety Stock (Persediaan Pengaman).
-    z_score: Nilai Z yang sesuai dengan tingkat layanan
-    std_dev_daily_demand: Standar deviasi permintaan harian
-    lead_time_days: Waktu tunggu dalam hari
-    """
     if lead_time_days <= 0 or std_dev_daily_demand < 0:
-        return 0 # Tidak ada safety stock jika lead time nol atau std dev negatif
+        return 0
     safety_stock = z_score * std_dev_daily_demand * np.sqrt(lead_time_days)
     return safety_stock
 
 def calculate_reorder_point(avg_daily_demand, lead_time_days, safety_stock):
-    """
-    Menghitung Reorder Point (Titik Pemesanan Kembali).
-    avg_daily_demand: Rata-rata permintaan harian
-    lead_time_days: Waktu tunggu dalam hari
-    safety_stock: Persediaan pengaman
-    """
     if lead_time_days < 0 or avg_daily_demand < 0:
-        return 0 # Tidak ada reorder point jika lead time atau avg daily demand negatif
+        return 0
     reorder_point = (avg_daily_demand * lead_time_days) + safety_stock
     return reorder_point
 
-st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
+st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
 
-st.title("📦 Simulasi Sistem Persediaan Barang (EOQ & ROP Model)")
-st.markdown("""
-Selamat datang di alat simulasi EOQ dan ROP interaktif!
-Aplikasi ini akan membantu Anda menentukan jumlah pemesanan optimal (EOQ), titik pemesanan kembali (ROP),
-dan persediaan pengaman (Safety Stock) untuk meminimalkan total biaya persediaan Anda
-sambil menjaga tingkat layanan yang diinginkan.
-""")
+st.header("📦 Manajemen Persediaan (EOQ)")
+# Menghilangkan subheader dan skenario studi kasus
+# st.subheader("Studi Kasus: Kedai Kopi 'Kopi Kita'")
+# st.markdown("""
+# **Skenario Bisnis:**
+# 'Kopi Kita' perlu menentukan jumlah pesanan biji kopi impor yang optimal untuk meminimalkan total biaya persediaan (biaya pesan dan biaya simpan).
+# """)
 
-# Input dari pengguna di sidebar
-st.sidebar.header("⚙️ Input Parameter Persediaan")
-# Mengubah nilai default agar grafik lebih jelas
-annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=5000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=1, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=1, value=500, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
+col1, col2 = st.columns([1.5, 2])
 
-st.sidebar.markdown("---")
-st.sidebar.header("🛡️ Parameter Safety Stock & ROP")
-lead_time_days = st.sidebar.number_input("Waktu Tunggu (Lead Time) (hari) ⏳", min_value=0, value=7, help="Jumlah hari antara pemesanan dan penerimaan barang.")
-service_level_percent = st.sidebar.slider("Tingkat Layanan (Service Level) (%) 🎯", min_value=50, max_value=99, value=95, help="Probabilitas tidak terjadi kekurangan stok selama waktu tunggu.")
-std_dev_daily_demand = st.sidebar.number_input("Standar Deviasi Permintaan Harian (unit) 📉", min_value=0.0, value=5.0, help="Variabilitas permintaan harian. Jika tidak tahu, coba estimasi.")
-
-
-# Perhitungan
-if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
-    st.subheader("📊 Hasil Utama Perhitungan EOQ Optimal")
-
-    eoq = calculate_eoq(annual_demand, ordering_cost, holding_cost)
+with col1:
+    st.markdown("""
+    Aplikasi ini akan membantu Anda menentukan jumlah pemesanan optimal (EOQ), titik pemesanan kembali (ROP),
+    dan persediaan pengaman (Safety Stock) untuk meminimalkan total biaya persediaan Anda
+    sambil menjaga tingkat layanan yang diinginkan.
+    """)
     
-    ordering_cost_at_eoq, holding_cost_at_eoq, total_cost_at_eoq = calculate_total_inventory_cost(annual_demand, ordering_cost, holding_cost, eoq)
-    orders_per_year_at_eoq = calculate_orders_per_year(annual_demand, eoq)
-
-    # Perhitungan ROP dan Safety Stock
-    avg_daily_demand = annual_demand / 365.0
-    z_score = norm.ppf(service_level_percent / 100.0) # Menggunakan scipy untuk Z-score
+    with st.container(border=True):
+        st.subheader("⚙️ Parameter Model")
+        # Menyesuaikan nilai default agar grafik tetap jelas tanpa konteks studi kasus
+        D = st.number_input("Permintaan Tahunan (unit)", min_value=1, value=5000)
+        S = st.number_input("Biaya Pemesanan per Pesanan (Rp)", min_value=0, value=100000)
+        H = st.number_input("Biaya Penyimpanan per unit per Tahun (Rp)", min_value=0, value=500)
+        lead_time = st.number_input("Lead Time Pengiriman (hari)", min_value=1, value=14)
+        safety_stock = st.number_input("Stok Pengaman (Safety Stock) (unit)", min_value=0, value=10, help="Stok tambahan untuk mengantisipasi ketidakpastian permintaan atau keterlambatan.")
     
-    safety_stock = calculate_safety_stock(z_score, std_dev_daily_demand, lead_time_days)
-    reorder_point = calculate_reorder_point(avg_daily_demand, lead_time_days, safety_stock)
-
-
-    # Menampilkan hasil dalam bentuk metrik yang lebih menarik
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("📦 Economic Order Quantity (EOQ)", f"{eoq:,.2f} unit" if np.isfinite(eoq) else "Tak Terhingga")
-        st.caption("Jumlah pesanan optimal yang meminimalkan total biaya.")
-    with col2:
-        st.metric("💰 Total Biaya Persediaan (pada EOQ)", format_rupiah(total_cost_at_eoq))
-        st.caption("Total biaya yang dikeluarkan jika memesan sejumlah EOQ.")
-    with col3:
-        st.metric("🔄 Jumlah Pemesanan per Tahun (pada EOQ)", f"{orders_per_year_at_eoq:,.2f} kali" if np.isfinite(orders_per_year_at_eoq) else "Tak Terhingga")
-        st.caption("Frekuensi pemesanan dalam setahun.")
-
-    st.markdown("---") # Garis pemisah
-
-    st.subheader("🛡️ Hasil Perhitungan Safety Stock & Reorder Point")
-    col_ss, col_rop = st.columns(2)
-    with col_ss:
-        st.metric("🛡️ Safety Stock (Persediaan Pengaman)", f"{safety_stock:,.2f} unit")
-        st.caption("Persediaan ekstra untuk melindungi dari variabilitas permintaan atau waktu tunggu.")
-    with col_rop:
-        st.metric("🔔 Reorder Point (Titik Pemesanan Kembali)", f"{reorder_point:,.2f} unit")
-        st.caption("Tingkat persediaan di mana pesanan baru harus dilakukan.")
-    
-    st.markdown("---") # Garis pemisah
-
-    # Bagian input kuantitas pesanan kustom
-    st.subheader("🔍 Analisis Kuantitas Pesanan Kustom")
-    default_custom_quantity = int(eoq) if np.isfinite(eoq) and eoq > 0 else annual_demand
-    custom_order_quantity = st.number_input("Masukkan Kuantitas Pesanan Kustom (Q_kustom) 🔢", min_value=1, value=default_custom_quantity, help="Masukkan jumlah pesanan yang ingin Anda analisis dan bandingkan.")
-
-    if custom_order_quantity > 0:
-        ordering_cost_custom, holding_cost_custom, total_cost_custom = calculate_total_inventory_cost(annual_demand, ordering_cost, holding_cost, custom_order_quantity)
-        orders_per_year_custom = calculate_orders_per_year(annual_demand, custom_order_quantity)
-
-        st.write(f"Jika Anda memesan **{custom_order_quantity:,.0f} unit** per pesanan:")
-        st.metric("Total Biaya Persediaan Kustom", format_rupiah(total_cost_custom))
-        st.metric("Jumlah Pemesanan per Tahun Kustom", f"{orders_per_year_custom:,.2f} kali" if np.isfinite(orders_per_year_custom) else "Tak Terhingga")
-
-        if np.isfinite(total_cost_at_eoq) and np.isfinite(total_cost_custom):
-            if total_cost_custom > total_cost_at_eoq:
-                st.warning(f"⚠️ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih tinggi dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}).")
-            elif total_cost_custom < total_cost_at_eoq:
-                st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih rendah dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}). Ini mungkin karena pembulatan atau nilai yang sangat dekat.")
-            else:
-                st.info("ℹ️ Total biaya kustom sama dengan total biaya pada EOQ.")
-        elif np.isfinite(total_cost_custom) and not np.isfinite(total_cost_at_eoq):
-            st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) adalah nilai yang terhingga, sedangkan EOQ memiliki biaya tak terhingga.")
-        elif not np.isfinite(total_cost_custom) and np.isfinite(total_cost_at_eoq):
-            st.warning(f"⚠️ Total biaya kustom adalah tak terhingga, sedangkan EOQ memiliki biaya terhingga ({format_rupiah(total_cost_at_eoq)}).")
-        else:
-            st.info("ℹ️ Baik total biaya kustom maupun total biaya pada EOQ adalah tak terhingga.")
-
-
-    st.markdown("---") # Garis pemisah
-
-    st.subheader("📋 Ringkasan Hasil")
-    summary_data = {
-        "Metrik": ["Economic Order Quantity (EOQ)", "Total Biaya Persediaan (pada EOQ)", "Jumlah Pemesanan per Tahun (pada EOQ)", "Safety Stock (Persediaan Pengaman)", "Reorder Point (Titik Pemesanan Kembali)"],
-        "Nilai": [
-            f"{eoq:,.2f} unit" if np.isfinite(eoq) else "Tak Terhingga",
-            format_rupiah(total_cost_at_eoq),
-            f"{orders_per_year_at_eoq:,.2f} kali" if np.isfinite(orders_per_year_at_eoq) else "Tak Terhingga",
-            f"{safety_stock:,.2f} unit",
-            f"{reorder_point:,.2f} unit"
-        ]
-    }
-    df_summary = pd.DataFrame(summary_data)
-    st.table(df_summary)
-
-    st.markdown("---") # Garis pemisah
-
-    # Menggunakan expander untuk detail perhitungan
-    with st.expander("➕ Lihat Detail Perhitungan Matematika"):
-        st.markdown("Berikut adalah langkah-langkah perhitungan berdasarkan input Anda:")
-
-        st.markdown("#### 1. Perhitungan Economic Order Quantity (EOQ)")
-        st.latex(r'''
-            EOQ = \sqrt{\frac{2 \times D \times S}{H}}
-        ''')
-        st.markdown(f"""
-        Di mana:
-        * $D$ = Permintaan Tahunan = {annual_demand} unit
-        * $S$ = Biaya Pemesanan = {format_rupiah(ordering_cost)}
-        * $H$ = Biaya Penyimpanan = {format_rupiah(holding_cost)}
+    with st.expander("Penjelasan Rumus Model: Economic Order Quantity (EOQ)"):
+        st.markdown("""
+        **Variabel Utama:**
+        - **D (Permintaan Tahunan):** Total jumlah unit yang dibutuhkan selama satu tahun.
+        - **S (Biaya Pemesanan):** Biaya tetap yang dikeluarkan setiap kali melakukan pemesanan.
+        - **H (Biaya Penyimpanan):** Biaya untuk menyimpan satu unit barang selama satu tahun.
+        - **Q (Kuantitas Pesanan):** Jumlah unit yang dipesan setiap kali melakukan pemesanan.
+        - **TC (Total Biaya):** Penjumlahan dari total biaya pemesanan tahunan dan total biaya penyimpanan tahunan.
+        - **ROP (Reorder Point):** Titik stok di mana pemesanan baru harus dilakukan.
         """)
-        st.latex(fr'''
-            EOQ = \sqrt{{\frac{{2 \times {annual_demand} \times {ordering_cost:,.2f}}}{{{holding_cost:,.2f}}}}}
-        ''')
-        st.latex(fr'''
-            EOQ = \sqrt{{\frac{{{2 * annual_demand * ordering_cost:,.2f}}}{{{holding_cost:,.2f}}}}}
-        ''')
-        if holding_cost > 0:
-            st.latex(fr'''
-                EOQ = \sqrt{{{ (2 * annual_demand * ordering_cost) / holding_cost:,.2f}}}
-            ''')
-            st.latex(fr'''
-                EOQ = {eoq:,.2f} \text{{ unit}}
-            ''')
-        else:
-            st.write("EOQ tak terhingga karena biaya penyimpanan adalah nol.")
 
+        # Rumus utama EOQ
+        st.markdown("**Rumus Utama:**")
+        st.latex(r''' Q^* = \sqrt{\frac{2DS}{H}} ''')
 
-        st.markdown("#### 2. Perhitungan Total Biaya Persediaan (pada EOQ)")
-        st.latex(r'''
-            \text{Total Biaya} = \text{Biaya Pemesanan} + \text{Biaya Penyimpanan}
-        ''')
-        st.latex(r'''
-            \text{Biaya Pemesanan} = \left(\frac{D}{Q}\right) \times S
-        ''')
-        st.latex(r'''
-            \text{Biaya Penyimpanan} = \left(\frac{Q}{2}\right) \times H
-        ''')
-        st.markdown(f"""
-        Dengan $Q = EOQ = {eoq:,.2f}$ unit:
-        """)
-        if np.isfinite(eoq) and eoq > 0:
-            st.latex(fr'''
-                \text{{Biaya Pemesanan}} = \left(\frac{{{annual_demand}}}{{{eoq:,.2f}}}\right) \times {format_rupiah(ordering_cost).replace('Rp ', '')}
-            ''')
-            st.latex(fr'''
-                \text{{Biaya Pemesanan}} = {format_rupiah((annual_demand / eoq) * ordering_cost)}
-            ''')
-            st.latex(fr'''
-                \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times {format_rupiah(holding_cost).replace('Rp ', '')}
-            ''')
-            st.latex(fr'''
-                \text{{Biaya Penyimpanan}} = {format_rupiah((eoq / 2) * holding_cost)}
-            ''')
-            st.latex(fr'''
-                \text{{Total Biaya}} = {format_rupiah(ordering_cost_at_eoq).replace('Rp ', '')} + {format_rupiah(holding_cost_at_eoq).replace('Rp ', '')}
-            ''')
-            st.latex(fr'''
-                \text{{Total Biaya}} = {format_rupiah(total_cost_at_eoq)}
-            ''')
-        else:
-            st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
+        # Rumus Pendukung ROP dan TC
+        st.markdown("**Rumus Pendukung:**")
+        st.latex(r'''ROP = (\text{Permintaan Harian}) \times \text{Lead Time} + \text{Stok Pengaman}''')
+        st.latex(r''' TC = \left(\frac{D}{Q}\right)S + \left(\frac{Q}{2}\right)H ''')
 
-
-        st.markdown("#### 3. Perhitungan Jumlah Pemesanan per Tahun (pada EOQ)")
-        st.latex(r'''
-            \text{Jumlah Pemesanan per Tahun} = \frac{D}{Q}
-        ''')
-        st.markdown(f"""
-        Dengan $Q = EOQ = {eoq:,.2f}$ unit:
-        """)
-        if np.isfinite(eoq) and eoq > 0:
-            st.latex(fr'''
-                \text{{Jumlah Pemesanan per Tahun}} = \frac{{{annual_demand}}}{{{eoq:,.2f}}}
-            ''')
-            st.latex(fr'''
-                \text{{Jumlah Pemesanan per Tahun}} = {orders_per_year_at_eoq:,.2f} \text{{ kali}}
-            ''')
-        else:
-            st.write("Jumlah pemesanan per tahun tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
-
-        st.markdown("#### 4. Perhitungan Safety Stock (Persediaan Pengaman)")
-        st.latex(r'''
-            \text{Rata-rata Permintaan Harian} = \frac{\text{Permintaan Tahunan}}{365}
-        ''')
-        st.latex(fr'''
-            \text{{Rata-rata Permintaan Harian}} = \frac{{{annual_demand}}}{{365}} = {avg_daily_demand:,.2f} \text{{ unit/hari}}
-        ''')
-        st.latex(r'''
-            Z\text{-score} = \text{Nilai dari distribusi normal standar}
-        ''')
-        st.markdown(f"Untuk tingkat layanan {service_level_percent}%, Z-score adalah sekitar {z_score:,.2f}.")
-        st.latex(fr'''\text{{Z-score}} = {z_score:,.2f}''') # Corrected line
-        st.latex(r'''
-            \text{Safety Stock} = Z\text{-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}
-        ''')
-        st.markdown(f"""
-        Di mana:
-        * $\text{{Z-score}} = {z_score:,.2f}$
-        * $\text{{Std Dev Permintaan Harian}}$ = {std_dev_daily_demand:,.2f} unit
-        * $\text{{Waktu Tunggu}}$ = {lead_time_days} hari
-        """)
-        st.latex(fr'''
-            \text{{Safety Stock}} = {z_score:,.2f} \times {std_dev_daily_demand:,.2f} \times \sqrt{{{lead_time_days}}}
-        ''')
-        if lead_time_days > 0:
-            st.latex(fr'''
-                \text{{Safety Stock}} = {z_score:,.2f} \times {std_dev_daily_demand:,.2f} \times {np.sqrt(lead_time_days):,.2f}
-            ''')
-        st.latex(fr'''
-            \text{{Safety Stock}} = {safety_stock:,.2f} \text{{ unit}}
-        ''')
-
-        st.markdown("#### 5. Perhitungan Reorder Point (Titik Pemesanan Kembali)")
-        st.latex(r'''
-            \text{Reorder Point} = (\text{Rata-rata Permintaan Harian} \times \text{Waktu Tunggu (hari)}) + \text{Safety Stock}
-        ''')
-        st.markdown(f"""
-        Di mana:
-        * $\text{{Rata-rata Permintaan Harian}}$ = {avg_daily_demand:,.2f} unit/hari
-        * $\text{{Waktu Tunggu}}$ = {lead_time_days} hari
-        * $\text{{Safety Stock}}$ = {safety_stock:,.2f} unit
-        """)
-        st.latex(fr'''
-            \text{{Reorder Point}} = ({avg_daily_demand:,.2f} \times {lead_time_days}) + {safety_stock:,.2f}
-        ''')
-        st.latex(fr'''
-            \text{{Reorder Point}} = { (avg_daily_demand * lead_time_days):,.2f} + {safety_stock:,.2f}
-        ''')
-        st.latex(fr'''
-            \text{{Reorder Point}} = {reorder_point:,.2f} \text{{ unit}}
-        ''')
-
-
-    st.markdown("---") # Garis pemisah
-
-    st.subheader("📈 Visualisasi Biaya Persediaan")
-
-    # Buat rentang kuantitas pesanan untuk grafik
-    # Pastikan rentang mencakup EOQ dan kuantitas kustom, dan selalu terhingga
-    min_q_plot = 1 # Minimum order quantity for the plot
-    if np.isfinite(eoq) and eoq > 0:
-        # Set max_q_value to be around 2.5 times EOQ to show the curve clearly
-        # But also ensure it's at least 1.5 times the custom quantity if that's larger
-        max_q_value_base = eoq * 2.5
+    # Perhitungan utama berdasarkan input
+    if H > 0 and D > 0:
+        eoq = math.sqrt((2 * D * S) / H)
+        frekuensi_pesanan = D / eoq if eoq > 0 else 0
+        biaya_pemesanan = (D/eoq) * S if eoq > 0 else 0
+        biaya_penyimpanan = (eoq/2) * H
+        total_biaya = biaya_pemesanan + biaya_penyimpanan
+        permintaan_harian = D / 360 # Menggunakan 360 hari untuk perhitungan harian
+        rop = (permintaan_harian * lead_time) + safety_stock
+        siklus_pemesanan = 360 / frekuensi_pesanan if frekuensi_pesanan > 0 else 0
     else:
-        # If EOQ is infinite or zero, base it on annual demand or a fixed large value
-        max_q_value_base = annual_demand * 0.5 if annual_demand > 0 else 1000
+        eoq = 0
+        total_biaya = 0
+        rop = 0
+        siklus_pemesanan = 0
+        frekuensi_pesanan = 0 # Ensure frekuensi_pesanan is defined even if H or D is 0
 
-    if np.isfinite(custom_order_quantity) and custom_order_quantity > 0:
-        max_q_value_base = max(max_q_value_base, custom_order_quantity * 1.5)
+    # Proses Perhitungan EOQ, ROP, dan TC    
+    with st.expander("Lihat Proses Perhitungan"):
+        st.markdown(f"**1. Perhitungan EOQ ($Q^*$):**")
+        if H > 0 and D > 0:
+            st.latex(fr"Q^* = \sqrt{{\frac{{2 \times {D} \times {S}}}{{{H}}}}} = {eoq:.2f} \text{{ unit}}")
+        else:
+            st.markdown("Tidak dapat menghitung EOQ karena biaya penyimpanan atau permintaan tahunan adalah nol.")
+        
+        st.markdown(f"**2. Perhitungan Titik Pemesanan Ulang (ROP):**")
+        st.latex(fr"ROP = ({D}/360 \times {lead_time}) + {safety_stock} = {rop:.2f} \text{{ unit}}")
+        
+        st.markdown(f"**3. Perhitungan Biaya Total Tahunan:**")
+        if np.isfinite(eoq) and eoq > 0:
+            st.latex(fr"TC = \left(\frac{{{D}}}{{{eoq:.2f}}}\right){S} + \left(\frac{{{eoq:.2f}}}{{2}}\right){H} = \text{{Rp }}{total_biaya:,.2f}")
+        else:
+            st.markdown("Tidak dapat menghitung Total Biaya karena EOQ tidak valid.")
 
-    # Ensure a reasonable upper bound for the plot, not excessively large
-    max_q_plot = max(50, int(max_q_value_base)) # Ensure it's at least 50 units for a visible curve
+with col2:
+    st.subheader("💡 Hasil dan Wawasan Bisnis")
+    st.success(f"**Kebijakan Optimal:** Pesan **{eoq:.0f} unit** setiap kali stok mencapai **{rop:.1f} unit**.")
+    
+    col1_res, col2_res = st.columns(2)
+    with col1_res:
+        st.metric(label="📦 Kuantitas Pesanan Optimal (EOQ)", value=f"{eoq:.0f} unit")
+        st.metric(label="🎯 Titik Pemesanan Ulang (ROP)", value=f"{rop:.1f} unit")
+    with col2_res:
+        st.metric(label="💰 Total Biaya Persediaan Tahunan", value=f"Rp {total_biaya:,.0f}")
+        st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.1f} hari")
 
-    q_values = np.linspace(min_q_plot, max_q_plot, 500)
+    with st.container(border=True):
+        st.markdown("**Analisis Kebijakan Persediaan:**")
+        # Menambahkan kondisi untuk memastikan eoq > 0 sebelum melakukan perbandingan
+        if eoq > 0:
+            if eoq > (D/4):
+                st.warning("- **Frekuensi Rendah:** Pesanan dalam jumlah besar tapi jarang. Ini hemat biaya pesan, tapi boros biaya simpan.")
+            elif eoq < (D/12):
+                st.info("- **Frekuensi Tinggi:** Pesanan dalam jumlah kecil tapi sering. Ini hemat biaya simpan, tapi boros biaya administrasi pemesanan.")
+            else:
+                st.success("- **Kebijakan Seimbang:** Kuantitas pesanan Anda menyeimbangkan biaya pesan dan biaya simpan dengan baik.")
+        else:
+            st.info("- Tidak ada analisis kebijakan yang tersedia karena EOQ tidak valid.")
+    
+    # Ini code untuk membuat grafik visualisasi analisis biaya
+    st.markdown("#### Visualisasi Analisis Biaya")
+    # Penyesuaian rentang Q untuk plot agar grafik lebih jelas
+    if eoq > 0:
+        q_min_plot = max(1, eoq * 0.1)
+        q_max_plot = eoq * 2.5 # Memperluas rentang sedikit untuk melihat kurva lebih jelas
+        q = np.linspace(q_min_plot, q_max_plot, 100)
+    else:
+        # Fallback if EOQ is 0 or infinite
+        q = np.linspace(1, 200, 100) # Default small range if EOQ is not meaningful
 
     # Filter out non-positive or non-finite q_values if any, though linspace should handle this if min_q_plot is > 0
-    q_values = q_values[q_values > 0]
-    if not np.any(q_values): # Handle case where q_values might become empty after filtering
+    q = q[q > 0]
+    if not np.any(q): # Handle case where q might become empty after filtering
         st.warning("Tidak dapat membuat plot biaya karena rentang kuantitas pesanan tidak valid.")
     else:
-        ordering_costs_plot = [(annual_demand / q) * ordering_cost for q in q_values]
-        holding_costs_plot = [(q / 2) * holding_cost for q in q_values]
-        total_costs_plot = [oc + hc for oc, hc in zip(ordering_costs_plot, holding_costs_plot)]
+        holding_costs = (q / 2) * H
+        ordering_costs = (D / q) * S
+        total_costs = holding_costs + ordering_costs
+        
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.plot(q, holding_costs, 'b-', label='Biaya Penyimpanan')
+        ax.plot(q, ordering_costs, 'g-', label='Biaya Pemesanan')
+        ax.plot(q, total_costs, 'r-', linewidth=3, label='Total Biaya')
+        if eoq > 0:
+            ax.axvline(x=eoq, color='purple', linestyle='--', label=f'EOQ')
+            # Penyesuaian posisi anotasi agar tidak tumpang tindih
+            ax.annotate(f'Biaya Terendah\nRp {total_biaya:,.0f}', xy=(eoq, total_biaya), 
+                        xytext=(eoq + (q_max_plot - q_min_plot) * 0.1, total_biaya * 0.8), # Menyesuaikan posisi teks
+                        arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=8, headlength=8),
+                        horizontalalignment='left', verticalalignment='bottom',
+                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=0.5, alpha=0.9))
 
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        # Reorder plot calls to match the desired legend order: Biaya Penyimpanan, Biaya Pemesanan, Total Biaya
-        ax.plot(q_values, holding_costs_plot, label="Biaya Penyimpanan", color='blue') # Blue for Holding Cost
-        ax.plot(q_values, ordering_costs_plot, label="Biaya Pemesanan", color='green') # Green for Ordering Cost
-        ax.plot(q_values, total_costs_plot, label="Total Biaya", color='red', linewidth=2) # Red for Total Cost
-
-        if np.isfinite(eoq) and eoq > 0:
-            ax.axvline(eoq, color='purple', linestyle='--', label=f'EOQ: {eoq:,.2f} unit') # Purple dashed line for EOQ
-            # Add annotation for lowest cost point
-            if np.isfinite(total_cost_at_eoq):
-                ax.annotate(f'Biaya Terendah\n{format_rupiah(total_cost_at_eoq)}',
-                            xy=(eoq, total_cost_at_eoq),
-                            # Adjust xytext and arrowprops for better positioning and appearance
-                            xytext=(eoq + max_q_plot * 0.05, total_cost_at_eoq + total_cost_at_eoq * 0.1),
-                            arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=8, headlength=8),
-                            horizontalalignment='left', verticalalignment='bottom',
-                            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=0.5, alpha=0.9))
-        
-        if np.isfinite(custom_order_quantity) and custom_order_quantity > 0:
-            # Check if custom_order_quantity is within the plot's x-limits to avoid drawing outside
-            if custom_order_quantity >= min_q_plot and custom_order_quantity <= max_q_plot:
-                ax.axvline(custom_order_quantity, color='#FFD700', linestyle=':', label=f'Kuantitas Kustom: {custom_order_quantity:,.0f} unit') # Gold
-        
-        ax.set_xlabel("Kuantitas Pemesanan (unit)") # Changed label to match image
-        ax.set_ylabel("Biaya Tahunan (Rp)") # Changed label to match image
-        ax.set_title("Analisis Biaya Persediaan (EOQ)") # Changed title to match image
+        ax.set_xlabel('Kuantitas Pemesanan (unit)') # Mengubah label dari 'kg' menjadi 'unit'
+        ax.set_ylabel('Biaya Tahunan (Rp)')
+        ax.set_title('Analisis Biaya Persediaan (EOQ)', fontsize=16)
         ax.legend()
-        ax.grid(True, linestyle='-', alpha=0.7) # Changed grid style to solid line
+        ax.grid(True)
+        ax.ticklabel_format(style='plain', axis='y')
         ax.set_ylim(bottom=0) # Memastikan sumbu y dimulai dari 0
-        ax.set_xlim(left=min_q_plot) # Ensure x-axis starts from min_q_plot
+        ax.set_xlim(left=q_min_plot) # Memastikan sumbu x dimulai dari q_min_plot
         st.pyplot(fig)
 
+        with st.container(border=True):
+            st.markdown("**🔍 Penjelasan Grafik Analisis Biaya:**")
+            st.markdown("""
+            Grafik ini menunjukkan trade-off antara biaya pemesanan dan biaya penyimpanan.
+            - **Garis Biru (Biaya Penyimpanan):** Semakin banyak barang yang dipesan, semakin tinggi biaya untuk menyimpannya.
+            - **Garis Hijau (Biaya Pemesanan):** Semakin banyak barang yang dipesan dalam satu waktu, semakin jarang kita memesan, sehingga total biaya pemesanan tahunan menurun.
+            - **Garis Merah (Total Biaya):** Adalah penjumlahan dari kedua biaya di atas.
+            - **Garis Ungu (EOQ):** Menandai titik di mana kurva total biaya mencapai titik terendahnya. Ini adalah kuantitas pesanan yang paling efisien.
+            """)
+
+    # Ini code untuk membuat grafik visualisasi siklus persediaan
+    st.markdown("#### Visualisasi Siklus Persediaan")
+    fig2, ax2 = plt.subplots(figsize=(10, 5))
+    if siklus_pemesanan > 0 and eoq > 0:
+        t_total = siklus_pemesanan * 2 # Menampilkan dua siklus penuh
+        t = np.linspace(0, t_total, 200)
+        stok_level = []
+        for time_point in t:
+            sisa_waktu_siklus = time_point % siklus_pemesanan
+            stok = (eoq + safety_stock) - permintaan_harian * sisa_waktu_siklus
+            stok_level.append(max(stok, safety_stock)) # Pastikan stok tidak turun di bawah safety stock
+            
+        ax2.plot(t, stok_level, label='Tingkat Persediaan')
+        ax2.axhline(y=rop, color='orange', linestyle='--', label=f'ROP ({rop:.1f} unit)') # Mengubah label dari 'kg' menjadi 'unit'
+        ax2.axhline(y=safety_stock, color='red', linestyle=':', label=f'Stok Pengaman ({safety_stock} unit)') # Mengubah label dari 'kg' menjadi 'unit'
+        
+        # Menambahkan titik pemesanan ulang pada grafik
+        # Hitung waktu saat ROP tercapai dalam setiap siklus
+        if permintaan_harian > 0:
+            time_to_reach_rop = (eoq / permintaan_harian) # Waktu dari puncak hingga ROP (tanpa safety stock)
+            for i in range(int(t_total / siklus_pemesanan) + 1):
+                order_time = (i * siklus_pemesanan) + time_to_reach_rop
+                if order_time <= t_total:
+                    ax2.scatter(order_time, rop, color='red', s=100, zorder=5)
+                    ax2.annotate('Pesan Ulang!', xy=(order_time, rop), 
+                                 xytext=(order_time, rop + eoq*0.3),
+                                 arrowprops=dict(facecolor='red', shrink=0.05))
+
+    ax2.set_xlabel('Waktu (Hari)')
+    ax2.set_ylabel('Jumlah Stok (unit)') # Mengubah label dari 'kg' menjadi 'unit'
+    ax2.set_title('Simulasi Siklus Persediaan', fontsize=16)
+    ax2.legend()
+    ax2.grid(True)
+    ax2.set_ylim(bottom=0)
+    st.pyplot(fig2)
+
+    with st.container(border=True):
+        st.markdown("**🔍 Penjelasan Grafik Siklus:**")
         st.markdown("""
-        **Penjelasan Grafik:**
-        * **Garis Biru (Biaya Penyimpanan):** Meningkat seiring bertambahnya kuantitas pesanan, karena Anda menyimpan lebih banyak persediaan.
-        * **Garis Hijau (Biaya Pemesanan):** Menurun seiring bertambahnya kuantitas pesanan, karena Anda memesan lebih jarang.
-        * **Garis Merah (Total Biaya):** Menunjukkan jumlah dari biaya pemesanan dan biaya penyimpanan. Titik terendah pada garis ini adalah EOQ.
-        * **Garis Ungu Putus-putus (EOQ):** Menunjukkan kuantitas pesanan optimal di mana total biaya persediaan berada pada titik terendah. (Hanya ditampilkan jika EOQ terhingga)
-        * **Anotasi Biaya Terendah:** Menunjukkan titik biaya total minimum pada EOQ.
-        * **Garis Emas Titik-titik (Kuantitas Kustom):** Menunjukkan posisi kuantitas pesanan kustom Anda pada grafik. (Hanya ditampilkan jika kuantitas kustom terhingga dan berada dalam rentang plot)
+        Grafik ini menyimulasikan pergerakan stok dari waktu ke waktu.
+        - **Garis Biru:** Menunjukkan tingkat persediaan yang terus menurun seiring penjualan harian.
+        - **Garis Oranye (ROP):** Ketika stok menyentuh garis ini, inilah saatnya untuk memesan barang baru.
+        - **Garis Merah (Stok Pengaman):** Stok minimum yang harus dijaga untuk menghindari kehabisan barang jika terjadi keterlambatan pengiriman.
+        - **Siklus:** Stok akan kembali penuh (ke level EOQ + Stok Pengaman) setelah pesanan baru tiba.
         """)
 
-    st.markdown("---") # Garis pemisah
-
-    # Menggunakan expander untuk analisis sensitivitas
-    with st.expander("🔬 Lakukan Analisis Sensitivitas"):
-        st.write("Lihat bagaimana EOQ dan biaya total berubah jika salah satu parameter bervariasi.")
-
-        st.markdown("#### Sensitivitas terhadap Permintaan Tahunan (D)")
-        demand_variations = np.linspace(annual_demand * 0.5, annual_demand * 1.5, 10)
-        sensitivity_data_D = []
-        for d_var in demand_variations:
-            eoq_var = calculate_eoq(d_var, ordering_cost, holding_cost)
-            _, _, total_cost_var = calculate_total_inventory_cost(d_var, ordering_cost, holding_cost, eoq_var)
-            sensitivity_data_D.append({"Permintaan (D)": f"{d_var:,.0f}", "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": format_rupiah(total_cost_var)})
-        df_sensitivity_D = pd.DataFrame(sensitivity_data_D)
-        st.dataframe(df_sensitivity_D)
-
-        st.markdown("#### Sensitivitas terhadap Biaya Pemesanan (S)")
-        ordering_cost_variations = np.linspace(ordering_cost * 0.5, ordering_cost * 1.5, 10)
-        sensitivity_data_S = []
-        for s_var in ordering_cost_variations:
-            eoq_var = calculate_eoq(annual_demand, s_var, holding_cost)
-            _, _, total_cost_var = calculate_total_inventory_cost(annual_demand, s_var, holding_cost, eoq_var)
-            sensitivity_data_S.append({"Biaya Pemesanan (S)": format_rupiah(s_var), "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": format_rupiah(total_cost_var)})
-        df_sensitivity_S = pd.DataFrame(sensitivity_data_S)
-        st.dataframe(df_sensitivity_S)
-
-        st.markdown("#### Sensitivitas terhadap Biaya Penyimpanan (H)")
-        holding_cost_variations = np.linspace(holding_cost * 0.5, holding_cost * 1.5, 10)
-        sensitivity_data_H = []
-        for h_var in holding_cost_variations:
-            if h_var > 0: # Pastikan biaya penyimpanan tidak nol untuk perhitungan EOQ
-                eoq_var = calculate_eoq(annual_demand, ordering_cost, h_var)
-                _, _, total_cost_var = calculate_total_inventory_cost(annual_demand, ordering_cost, h_var, eoq_var)
-                sensitivity_data_H.append({"Biaya Penyimpanan (H)": format_rupiah(h_var), "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": format_rupiah(total_cost_var)})
-            else:
-                sensitivity_data_H.append({"Biaya Penyimpanan (H)": format_rupiah(h_var), "EOQ": "Tak Terhingga", "Total Biaya": "Tak Terhingga"})
-        df_sensitivity_H = pd.DataFrame(sensitivity_data_H)
-        st.dataframe(df_sensitivity_H)
-
-    st.markdown("---") # Garis pemisah
-    st.markdown("Made with ❤️ using Streamlit.")
+st.markdown("---")
+st.markdown("Made with ❤️ using Streamlit.")
