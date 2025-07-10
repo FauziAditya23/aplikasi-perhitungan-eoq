@@ -102,20 +102,7 @@ with st.sidebar:
     **Kelas:** [Kelas Anda]
     **Kampus:** [Nama Kampus Anda]
     """)
-    st.markdown("---")
-    st.markdown("<h4>Model Lainnya:</h4>")
-    st.markdown("<h4>1. 📊 Optimalisasi Produksi:</h4>")
-    st.markdown("Mencari kombinasi produk yang memaksimalkan keuntungan dengan sumber daya terbatas.")
-    
-    st.markdown("<h4>2. 📦 Model Persediaan (EOQ):</h4>")
-    st.markdown("Menentukan kuantitas pesanan optimal untuk meminimalkan total biaya persediaan.")
-    
-    st.markdown("<h4>3. 📈 Model Antrian:</h4>")
-    st.markdown("Menganalisis kinerja sistem antrian untuk meningkatkan efisiensi layanan.")
-    
-    st.markdown("<h4>4. 🚚 Model Transportasi:</h4>")
-    st.markdown("Mengoptimalkan rute pengiriman untuk meminimalkan biaya transportasi.")
-
+ 
 # --- Area Utama Aplikasi (Input, Penjelasan Rumus, dan Tombol) ---
 st.markdown("""
 <div style="font-size: 1.1em;">
