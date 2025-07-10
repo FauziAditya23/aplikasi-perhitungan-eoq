@@ -74,7 +74,7 @@ st.divider() # Garis pemisah visual
 
 # --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk input) ---
 # Nilai default diubah agar lebih realistis untuk perhitungan tahunan
-D_default = 40000
+D_default = 15500
 S_default = 250000 
 H_default = 7500 
 lead_time_default = 7 # Lead Time Pengiriman (hari) - Tetap
