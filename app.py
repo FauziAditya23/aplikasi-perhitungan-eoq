@@ -84,13 +84,26 @@ safety_stock_default = 20
 with st.sidebar:
     st.markdown("<h3>Panduan Aplikasi</h3>", unsafe_allow_html=True)
     st.markdown("""
-    Aplikasi ini mendemonstrasikan empat model matematika melalui
-    studi kasus yang relevan dengan industri di Indonesia.
-    Setiap tab menyediakan analisis, visualisasi, dan
-    wawasan bisnis yang dapat ditindaklanjuti.
+    Aplikasi ini adalah simulator EOQ (Economic Order Quantity) dan ROP (Reorder Point) interaktif.
+    Ikuti langkah-langkah di bawah untuk menggunakannya:
+    
+    1.  **Atur Parameter Input:** Sesuaikan nilai "Permintaan Tahunan", "Biaya Pemesanan", "Biaya Penyimpanan", "Lead Time Pengiriman", dan "Stok Pengaman" di bagian "Parameter Model Input".
+    2.  **Pahami Rumus:** Buka bagian "Penjelasan Rumus Model" untuk melihat rumus yang digunakan dalam perhitungan.
+    3.  **Hitung Optimalisasi:** Klik tombol "✨ Hitung Optimalisasi Persediaan" untuk melihat hasil perhitungan optimal, analisis kebijakan, proses perhitungan lengkap, dan visualisasi grafik.
+    4.  **Analisis Hasil:** Tinjau "Hasil dan Wawasan Bisnis" serta grafik untuk memahami kebijakan persediaan yang optimal.
+    5.  **Lihat Detail Perhitungan:** Buka "Lihat Proses Perhitungan Lengkap" untuk melihat langkah demi langkah perhitungan.
     """)
     st.info("Tips: Ubah parameter di setiap model untuk melihat bagaimana hasilnya berubah secara real-time!")
     
+    st.markdown("---")
+    st.markdown("<h4>Tentang Saya:</h4>")
+    st.markdown("""
+    **Nama:** [Nama Anda]
+    **Kelas:** [Kelas Anda]
+    **Kampus:** [Nama Kampus Anda]
+    """)
+    st.markdown("---")
+    st.markdown("<h4>Model Lainnya:</h4>")
     st.markdown("<h4>1. 📊 Optimalisasi Produksi:</h4>")
     st.markdown("Mencari kombinasi produk yang memaksimalkan keuntungan dengan sumber daya terbatas.")
     
