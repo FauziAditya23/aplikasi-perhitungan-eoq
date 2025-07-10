@@ -62,11 +62,11 @@ def calculate_orders_per_year(D, Q):
 st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
 
 # --- Header Utama Aplikasi ---
-st.markdown("<h1 style='text-align: center; color: #2E86C1; font-size: 3em;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: #5D6D7E; font-size: 1.8em;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; font-size: 3em;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; font-size: 1.8em;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True)
 
 st.markdown("""
-<div style="text-align: center; font-size: 1.1em; color: #34495E;">
+<div style="text-align: center; font-size: 1.1em;">
 Selamat datang di alat simulasi interaktif untuk <strong>Economic Order Quantity (EOQ)</strong> dan <strong>Reorder Point (ROP)</strong>!
 Aplikasi ini dirancang untuk membantu Anda menemukan strategi pemesanan optimal yang meminimalkan total biaya persediaan
 sambil memastikan ketersediaan stok yang memadai. Mari kita optimalkan rantai pasok Anda! 🚀
@@ -81,7 +81,7 @@ col1, col2 = st.columns([1.5, 2])
 # --- Kolom Input Parameter (col1) ---
 with col1:
     st.markdown("""
-    <div style="font-size: 1.1em; color: #34495E;">
+    <div style="font-size: 1.1em;">
     <strong>Skenario Bisnis:</strong>
     'Kopi Kita' adalah kedai kopi yang sedang berkembang dan menghadapi tantangan dalam mengelola persediaan biji kopi impor.
     Tujuan utama adalah menentukan jumlah pesanan biji kopi yang paling efisien untuk meminimalkan total biaya persediaan,
@@ -92,14 +92,14 @@ with col1:
     # Menggunakan expander untuk parameter input agar tampilan lebih rapi
     with st.expander("Konfigurasi Parameter Model ⚙️", expanded=True):
         with st.container(border=True):
-            st.markdown("<h4 style='color: #2874A6;'>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
+            st.markdown("<h4>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
             # Nilai default dipertahankan dari versi sebelumnya
             D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
             S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
             H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=500, help="Biaya untuk menyimpan satu kg biji kopi selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
             
             st.markdown("---") # Pemisah dalam container
-            st.markdown("<h4 style='color: #2874A6;'>🛡️ Parameter Stok Pengaman & ROP</h4>", unsafe_allow_html=True)
+            st.markdown("<h4>🛡️ Parameter Stok Pengaman & ROP</h4>", unsafe_allow_html=True)
             lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=7, help="Jumlah hari antara pemesanan dan penerimaan biji kopi.")
             safety_stock = st.number_input("Stok Pengaman (Safety Stock) (kg) 🚨", min_value=0, value=20, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan pengiriman.")
     
