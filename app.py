@@ -89,10 +89,10 @@ sambil menjaga tingkat layanan yang diinginkan.
 
 # Input dari pengguna di sidebar
 st.sidebar.header("⚙️ Input Parameter Persediaan")
-annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=1200, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-# Mengubah min_value dan value menjadi integer
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=1, value=50000, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=1, value=2000, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
+# Mengubah nilai default agar grafik lebih jelas
+annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=5000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
+ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=1, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=1, value=500, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
 
 st.sidebar.markdown("---")
 st.sidebar.header("🛡️ Parameter Safety Stock & ROP")
