@@ -62,14 +62,16 @@ def calculate_orders_per_year(D, Q):
 st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
 
 # --- Header Utama Aplikasi ---
-st.markdown("<h1 style='text-align: center; color: #2E86C1;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; color: #5D6D7E;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #2E86C1; font-size: 3em;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; color: #5D6D7E; font-size: 1.8em;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True)
 
 st.markdown("""
-Selamat datang di alat simulasi interaktif untuk **Economic Order Quantity (EOQ)** dan **Reorder Point (ROP)**!
+<div style="text-align: center; font-size: 1.1em; color: #34495E;">
+Selamat datang di alat simulasi interaktif untuk <strong>Economic Order Quantity (EOQ)</strong> dan <strong>Reorder Point (ROP)</strong>!
 Aplikasi ini dirancang untuk membantu Anda menemukan strategi pemesanan optimal yang meminimalkan total biaya persediaan
 sambil memastikan ketersediaan stok yang memadai. Mari kita optimalkan rantai pasok Anda! 🚀
-""")
+</div>
+""", unsafe_allow_html=True)
 
 st.divider() # Garis pemisah visual
 
@@ -79,23 +81,25 @@ col1, col2 = st.columns([1.5, 2])
 # --- Kolom Input Parameter (col1) ---
 with col1:
     st.markdown("""
-    **Skenario Bisnis:**
+    <div style="font-size: 1.1em; color: #34495E;">
+    <strong>Skenario Bisnis:</strong>
     'Kopi Kita' adalah kedai kopi yang sedang berkembang dan menghadapi tantangan dalam mengelola persediaan biji kopi impor.
     Tujuan utama adalah menentukan jumlah pesanan biji kopi yang paling efisien untuk meminimalkan total biaya persediaan,
     yang mencakup biaya pemesanan dan biaya penyimpanan.
-    """)
+    </div>
+    """, unsafe_allow_html=True)
     
     # Menggunakan expander untuk parameter input agar tampilan lebih rapi
     with st.expander("Konfigurasi Parameter Model ⚙️", expanded=True):
         with st.container(border=True):
-            st.markdown("<h4>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
+            st.markdown("<h4 style='color: #2874A6;'>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
             # Nilai default dipertahankan dari versi sebelumnya
             D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
             S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
             H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=500, help="Biaya untuk menyimpan satu kg biji kopi selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
             
             st.markdown("---") # Pemisah dalam container
-            st.markdown("<h4>🛡️ Parameter Stok Pengaman & ROP</h4>", unsafe_allow_html=True)
+            st.markdown("<h4 style='color: #2874A6;'>🛡️ Parameter Stok Pengaman & ROP</h4>", unsafe_allow_html=True)
             lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=7, help="Jumlah hari antara pemesanan dan penerimaan biji kopi.")
             safety_stock = st.number_input("Stok Pengaman (Safety Stock) (kg) 🚨", min_value=0, value=20, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan pengiriman.")
     
@@ -229,9 +233,10 @@ with col1:
             st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
 
 # --- Tombol untuk memicu perhitungan dan tampilan hasil ---
-if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
+st.markdown("<br>", unsafe_allow_html=True) # Spasi sebelum tombol
+if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container_width=True):
     with col2:
-        st.header("💡 Hasil dan Wawasan Bisnis")
+        st.markdown("<h2 style='color: #2E86C1;'>💡 Hasil dan Wawasan Bisnis</h2>", unsafe_allow_html=True)
         st.success(f"**Kebijakan Optimal untuk 'Kopi Kita':** Pesan **{eoq:.0f} kg** biji kopi setiap kali stok mencapai **{rop:.1f} kg**.")
         
         col1_res, col2_res = st.columns(2)
@@ -245,7 +250,7 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
         st.divider() # Garis pemisah visual
 
         with st.container(border=True):
-            st.subheader("📊 Analisis Kebijakan Persediaan")
+            st.markdown("<h4 style='color: #2874A6;'>📊 Analisis Kebijakan Persediaan</h4>", unsafe_allow_html=True)
             if eoq > 0:
                 if eoq > (D/4):
                     st.warning("- **Frekuensi Rendah:** Pesanan dalam jumlah besar tapi jarang. Ini hemat biaya pesan, tapi boros biaya simpan.")
@@ -259,7 +264,7 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
         st.divider() # Garis pemisah visual
 
         # Ini code untuk membuat grafik visualisasi analisis biaya
-        st.subheader("📈 Visualisasi Analisis Biaya")
+        st.markdown("<h4 style='color: #2874A6;'>📈 Visualisasi Analisis Biaya</h4>", unsafe_allow_html=True)
         if eoq > 0:
             q_min_plot = max(1, eoq * 0.1)
             q_max_plot = eoq * 2.5 # Memperluas rentang sedikit untuk melihat kurva lebih jelas
@@ -281,7 +286,7 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
             ax.plot(q, total_costs, 'r-', linewidth=3, label='Total Biaya')
             if eoq > 0 and np.isfinite(total_biaya):
                 ax.axvline(x=eoq, color='purple', linestyle='--', label=f'EOQ: {eoq:,.2f} kg')
-                ax.annotate(f'Biaya Terendah\nRp {total_biaya:,.0f}', xy=(eoq, total_biaya), 
+                ax.annotate(f'Biaya Terendah\n{format_rupiah(total_biaya)}', xy=(eoq, total_biaya), 
                             xytext=(eoq * 1.1, total_biaya * 1.1), # Menyesuaikan posisi teks relatif
                             arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=8, headlength=8),
                             horizontalalignment='left', verticalalignment='bottom',
