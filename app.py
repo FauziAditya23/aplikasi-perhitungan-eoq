@@ -1,7 +1,7 @@
 import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd # Import pandas for table display
+import pandas as pd # Untuk tampilan tabel
 from scipy.stats import norm # Untuk perhitungan Z-score yang lebih akurat
 
 def format_rupiah(value):
@@ -91,7 +91,7 @@ sambil menjaga tingkat layanan yang diinginkan.
 st.sidebar.header("⚙️ Input Parameter Persediaan")
 annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=10000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
 ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000.0, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) �", min_value=0.01, value=50000.0, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000.0, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
 
 st.sidebar.markdown("---")
 st.sidebar.header("🛡️ Parameter Safety Stock & ROP")
@@ -159,7 +159,8 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
             if total_cost_custom > total_cost_at_eoq:
                 st.warning(f"⚠️ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih tinggi dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}).")
             elif total_cost_custom < total_cost_at_eoq:
-                st.success(f"✅ Total biaya kustom ({format_cost_custom)}) lebih rendah dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}). Ini mungkin karena pembulatan atau nilai yang sangat dekat.")
+                # FIX: Corrected format_cost_custom to format_rupiah(total_cost_custom)
+                st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih rendah dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}). Ini mungkin karena pembulatan atau nilai yang sangat dekat.")
             else:
                 st.info("ℹ️ Total biaya kustom sama dengan total biaya pada EOQ.")
         elif np.isfinite(total_cost_custom) and not np.isfinite(total_cost_at_eoq):
