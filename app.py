@@ -41,7 +41,7 @@ def calculate_orders_per_year(D, Q):
     orders = D / Q
     return orders
 
-st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="�") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
+st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="📈") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
 
 st.title("📦 Simulasi Sistem Persediaan Barang (EOQ Model)")
 st.markdown("""
@@ -53,8 +53,8 @@ meminimalkan total biaya, dan menganalisis bagaimana perubahan parameter memenga
 # Input dari pengguna di sidebar
 st.sidebar.header("⚙️ Input Parameter Persediaan")
 annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=1000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) 💸", min_value=0.01, value=50.0, help="Biaya tetap untuk setiap kali melakukan pemesanan.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) 🏦", min_value=0.01, value=5.0, help="Biaya untuk menyimpan satu unit barang selama setahun (misal: biaya sewa gudang, asuransi, dll.).")
+ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=50.0, help="Biaya tetap untuk setiap kali melakukan pemesanan.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) �", min_value=0.01, value=5.0, help="Biaya untuk menyimpan satu unit barang selama setahun (misal: biaya sewa gudang, asuransi, dll.).")
 
 # Perhitungan
 if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
@@ -172,22 +172,22 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         """)
         if np.isfinite(eoq) and eoq > 0:
             st.latex(fr'''
-                \text{{Biaya Pemesanan}} = \left(\frac{{{annual_demand}}}{{{eoq:,.2f}}}\right) \times {ordering_cost:,.2f}
+                \text{{Biaya Pemesanan}} = \left(\frac{{{annual_demand}}}{{{eoq:,.2f}}}\right) \times \text{{Rp }} {ordering_cost:,.2f}
             ''')
             st.latex(fr'''
-                \text{{Biaya Pemesanan}} = { (annual_demand / eoq) * ordering_cost:,.2f}
+                \text{{Biaya Pemesanan}} = \text{{Rp }} { (annual_demand / eoq) * ordering_cost:,.2f}
             ''')
             st.latex(fr'''
-                \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times {holding_cost:,.2f}
+                \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times \text{{Rp }} {holding_cost:,.2f}
             ''')
             st.latex(fr'''
-                \text{{Biaya Penyimpanan}} = { (eoq / 2) * holding_cost:,.2f}
+                \text{{Biaya Penyimpanan}} = \text{{Rp }} { (eoq / 2) * holding_cost:,.2f}
             ''')
             st.latex(fr'''
-                \text{{Total Biaya}} = {ordering_cost_at_eoq:,.2f} + {holding_cost_at_eoq:,.2f}
+                \text{{Total Biaya}} = \text{{Rp }} {ordering_cost_at_eoq:,.2f} + \text{{Rp }} {holding_cost_at_eoq:,.2f}
             ''')
             st.latex(fr'''
-                \text{{Total Biaya}} = {total_cost_at_eoq:,.2f}
+                \text{{Total Biaya}} = \text{{Rp }} {total_cost_at_eoq:,.2f}
             ''')
         else:
             st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
@@ -240,7 +240,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         ax.axvline(custom_order_quantity, color='#FFD700', linestyle=':', label=f'Kuantitas Kustom: {custom_order_quantity:,.0f}') # Gold
     
     ax.set_xlabel("Kuantitas Pesanan (Q)")
-    ax.set_ylabel("Biaya (Rp)")
+    ax.set_ylabel("Biaya (Rp)") # Menambahkan (Rp) pada label sumbu Y
     ax.set_title("Grafik Biaya Persediaan vs. Kuantitas Pesanan")
     ax.legend()
     ax.grid(True, linestyle='--', alpha=0.7)
