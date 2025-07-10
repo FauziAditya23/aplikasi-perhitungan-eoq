@@ -90,8 +90,9 @@ sambil menjaga tingkat layanan yang diinginkan.
 # Input dari pengguna di sidebar
 st.sidebar.header("⚙️ Input Parameter Persediaan")
 annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=10000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000.0, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000.0, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
+# Mengubah min_value dan value menjadi integer
+ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=1, value=5000000, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=1, value=50000, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
 
 st.sidebar.markdown("---")
 st.sidebar.header("🛡️ Parameter Safety Stock & ROP")
@@ -283,8 +284,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
             Z\text{-score} = \text{Nilai dari distribusi normal standar}
         ''')
         st.markdown(f"Untuk tingkat layanan {service_level_percent}%, Z-score adalah sekitar {z_score:,.2f}.")
-        # FIX: Corrected the LaTeX string for Z-score to avoid NameError
-        st.latex(fr'''\text{{Z-score}} = {z_score:,.2f}''')
+        st.latex(fr'''\text{{Z-score}} = {z_score:,.2f}''') # Corrected line
         st.latex(r'''
             \text{Safety Stock} = Z\text{-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}
         ''')
