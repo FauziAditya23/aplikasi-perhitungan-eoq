@@ -242,17 +242,12 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         st.latex(r'''
             \text{Rata-rata Permintaan Harian} = \frac{\text{Permintaan Tahunan}}{360}
         ''')
-        st.latex(fr'''
-            \text{{Rata-rata Permintaan Harian}} = \frac{{{D}}}{{360}} = {permintaan_harian:,.2f} \text{{ kg/hari}}
-        ''')
-        st.latex(r'''
-            ROP = (\text{Rata-rata Permintaan Harian} \times \text{Lead Time}) + \text{Stok Pengaman}
-        ''')
+        # Perubahan di sini: menghapus \text{} dari st.markdown untuk menghindari 'ext'
         st.markdown(f"""
         Di mana:
-        * $\text{{Rata-rata Permintaan Harian}}$ = {permintaan_harian:,.2f} kg/hari
-        * $\text{{Lead Time}}$ = {lead_time} hari
-        * $\text{{Stok Pengaman}}$ = {safety_stock} kg
+        * Rata-rata Permintaan Harian = {permintaan_harian:,.2f} kg/hari
+        * Lead Time = {lead_time} hari
+        * Stok Pengaman = {safety_stock} kg
         """)
         st.latex(fr'''
             ROP = ({permintaan_harian:,.2f} \times {lead_time}) + {safety_stock}
