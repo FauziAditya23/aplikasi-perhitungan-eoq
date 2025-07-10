@@ -77,7 +77,7 @@ st.divider() # Garis pemisah visual
 D_default = 150000
 S_default = 7500000 
 H_default = 25000 
-lead_time_default = 7 # Lead Time Pengiriman (hari) - Tetap
+lead_time_default = 5 # Lead Time Pengiriman (hari) - Tetap
 safety_stock_default = 300 # Stok Pengaman (kg) - Lebih realistis
 
 # --- Kolom Panduan Aplikasi (di Sidebar) ---
