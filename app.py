@@ -90,7 +90,7 @@ with col1:
         with st.container(border=True):
             st.header("⚙️ Parameter Model Input")
             # Nilai default dipertahankan dari versi sebelumnya
-            D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
+            D = st.number_input("Permintaan Tahunan (kg) �", min_value=1, value=5000, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
             S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=100000, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
             H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=500, help="Biaya untuk menyimpan satu kg biji kopi selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
             
@@ -119,6 +119,97 @@ with col1:
         st.markdown("**Rumus Pendukung (ROP & TC):**")
         st.latex(r'''ROP = (\text{Permintaan Harian}) \times \text{Lead Time} + \text{Stok Pengaman}''')
         st.latex(r''' TC = \left(\frac{D}{Q}\right)S + \left(\frac{Q}{2}\right)H ''')
+
+    # Menambahkan bagian Proses Perhitungan di sini
+    with st.expander("➕ Lihat Proses Perhitungan Lengkap"):
+        st.markdown("Berikut adalah langkah-langkah perhitungan berdasarkan input Anda:")
+
+        st.markdown("#### 1. Perhitungan Economic Order Quantity (EOQ)")
+        st.latex(r'''
+            EOQ = \sqrt{\frac{2 \times D \times S}{H}}
+        ''')
+        st.markdown(f"""
+        Di mana:
+        * $D$ = Permintaan Tahunan = {D} kg
+        * $S$ = Biaya Pemesanan = {format_rupiah(S)}
+        * $H$ = Biaya Penyimpanan = {format_rupiah(H)}
+        """)
+        st.latex(fr'''
+            EOQ = \sqrt{{\frac{{2 \times {D} \times {S:,.2f}}}{{{H:,.2f}}}}}
+        ''')
+        st.latex(fr'''
+            EOQ = \sqrt{{\frac{{{2 * D * S:,.2f}}}{{{H:,.2f}}}}}
+        ''')
+        if H > 0:
+            st.latex(fr'''
+                EOQ = \sqrt{{{ (2 * D * S) / H:,.2f}}}
+            ''')
+            st.latex(fr'''
+                EOQ = {eoq:,.2f} \text{{ kg}}
+            ''')
+        else:
+            st.write("EOQ tak terhingga karena biaya penyimpanan adalah nol.")
+
+        st.markdown("#### 2. Perhitungan Titik Pemesanan Ulang (ROP)")
+        st.latex(r'''
+            \text{Rata-rata Permintaan Harian} = \frac{\text{Permintaan Tahunan}}{360}
+        ''')
+        st.latex(fr'''
+            \text{{Rata-rata Permintaan Harian}} = \frac{{{D}}}{{360}} = {permintaan_harian:,.2f} \text{{ kg/hari}}
+        ''')
+        st.latex(r'''
+            ROP = (\text{Rata-rata Permintaan Harian} \times \text{Lead Time}) + \text{Stok Pengaman}
+        ''')
+        st.markdown(f"""
+        Di mana:
+        * $\text{{Rata-rata Permintaan Harian}}$ = {permintaan_harian:,.2f} kg/hari
+        * $\text{{Lead Time}}$ = {lead_time} hari
+        * $\text{{Stok Pengaman}}$ = {safety_stock} kg
+        """)
+        st.latex(fr'''
+            ROP = ({permintaan_harian:,.2f} \times {lead_time}) + {safety_stock}
+        ''')
+        st.latex(fr'''
+            ROP = { (permintaan_harian * lead_time):,.2f} + {safety_stock}
+        ''')
+        st.latex(fr'''
+            ROP = {rop:,.2f} \text{{ kg}}
+        ''')
+
+        st.markdown("#### 3. Perhitungan Total Biaya Persediaan Tahunan")
+        st.latex(r'''
+            \text{Total Biaya} = \text{Biaya Pemesanan} + \text{Biaya Penyimpanan}
+        ''')
+        st.latex(r'''
+            \text{Biaya Pemesanan} = \left(\frac{D}{Q}\right) \times S
+        ''')
+        st.latex(r'''
+            \text{Biaya Penyimpanan} = \left(\frac{Q}{2}\right) \times H
+        ''')
+        st.markdown(f"""
+        Dengan $Q = EOQ = {eoq:,.2f}$ kg:
+        """)
+        if np.isfinite(eoq) and eoq > 0:
+            st.latex(fr'''
+                \text{{Biaya Pemesanan}} = \left(\frac{{{D}}}{{{eoq:,.2f}}}\right) \times {format_rupiah(S).replace('Rp ', '')}
+            ''')
+            st.latex(fr'''
+                \text{{Biaya Pemesanan}} = {format_rupiah(biaya_pemesanan)}
+            ''')
+            st.latex(fr'''
+                \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times {format_rupiah(H).replace('Rp ', '')}
+            ''')
+            st.latex(fr'''
+                \text{{Biaya Penyimpanan}} = {format_rupiah(biaya_penyimpanan)}
+            ''')
+            st.latex(fr'''
+                \text{{Total Biaya}} = {format_rupiah(biaya_pemesanan).replace('Rp ', '')} + {format_rupiah(biaya_penyimpanan).replace('Rp ', '')}
+            ''')
+            st.latex(fr'''
+                \text{{Total Biaya}} = {format_rupiah(total_biaya)}
+            ''')
+        else:
+            st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
 
 # --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk plot awal jika diinginkan,
 #     tetapi tampilan hasil diatur oleh tombol) ---
@@ -166,99 +257,6 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
             else:
                 st.info("- Tidak ada analisis kebijakan yang tersedia karena EOQ tidak valid (biaya penyimpanan atau permintaan tahunan nol).")
         
-        st.divider() # Garis pemisah visual
-
-        # Menambahkan bagian Proses Perhitungan
-        with st.expander("➕ Lihat Proses Perhitungan Lengkap"):
-            st.markdown("Berikut adalah langkah-langkah perhitungan berdasarkan input Anda:")
-
-            st.markdown("#### 1. Perhitungan Economic Order Quantity (EOQ)")
-            st.latex(r'''
-                EOQ = \sqrt{\frac{2 \times D \times S}{H}}
-            ''')
-            st.markdown(f"""
-            Di mana:
-            * $D$ = Permintaan Tahunan = {D} kg
-            * $S$ = Biaya Pemesanan = {format_rupiah(S)}
-            * $H$ = Biaya Penyimpanan = {format_rupiah(H)}
-            """)
-            st.latex(fr'''
-                EOQ = \sqrt{{\frac{{2 \times {D} \times {S:,.2f}}}{{{H:,.2f}}}}}
-            ''')
-            st.latex(fr'''
-                EOQ = \sqrt{{\frac{{{2 * D * S:,.2f}}}{{{H:,.2f}}}}}
-            ''')
-            if H > 0:
-                st.latex(fr'''
-                    EOQ = \sqrt{{{ (2 * D * S) / H:,.2f}}}
-                ''')
-                st.latex(fr'''
-                    EOQ = {eoq:,.2f} \text{{ kg}}
-                ''')
-            else:
-                st.write("EOQ tak terhingga karena biaya penyimpanan adalah nol.")
-
-            st.markdown("#### 2. Perhitungan Titik Pemesanan Ulang (ROP)")
-            st.latex(r'''
-                \text{Rata-rata Permintaan Harian} = \frac{\text{Permintaan Tahunan}}{360}
-            ''')
-            st.latex(fr'''
-                \text{{Rata-rata Permintaan Harian}} = \frac{{{D}}}{{360}} = {permintaan_harian:,.2f} \text{{ kg/hari}}
-            ''')
-            st.latex(r'''
-                ROP = (\text{Rata-rata Permintaan Harian} \times \text{Lead Time}) + \text{Stok Pengaman}
-            ''')
-            st.markdown(f"""
-            Di mana:
-            * $\text{{Rata-rata Permintaan Harian}}$ = {permintaan_harian:,.2f} kg/hari
-            * $\text{{Lead Time}}$ = {lead_time} hari
-            * $\text{{Stok Pengaman}}$ = {safety_stock} kg
-            """)
-            st.latex(fr'''
-                ROP = ({permintaan_harian:,.2f} \times {lead_time}) + {safety_stock}
-            ''')
-            st.latex(fr'''
-                ROP = { (permintaan_harian * lead_time):,.2f} + {safety_stock}
-            ''')
-            st.latex(fr'''
-                ROP = {rop:,.2f} \text{{ kg}}
-            ''')
-
-            st.markdown("#### 3. Perhitungan Total Biaya Persediaan Tahunan")
-            st.latex(r'''
-                \text{Total Biaya} = \text{Biaya Pemesanan} + \text{Biaya Penyimpanan}
-            ''')
-            st.latex(r'''
-                \text{Biaya Pemesanan} = \left(\frac{D}{Q}\right) \times S
-            ''')
-            st.latex(r'''
-                \text{Biaya Penyimpanan} = \left(\frac{Q}{2}\right) \times H
-            ''')
-            st.markdown(f"""
-            Dengan $Q = EOQ = {eoq:,.2f}$ kg:
-            """)
-            if np.isfinite(eoq) and eoq > 0:
-                st.latex(fr'''
-                    \text{{Biaya Pemesanan}} = \left(\frac{{{D}}}{{{eoq:,.2f}}}\right) \times {format_rupiah(S).replace('Rp ', '')}
-                ''')
-                st.latex(fr'''
-                    \text{{Biaya Pemesanan}} = {format_rupiah(biaya_pemesanan)}
-                ''')
-                st.latex(fr'''
-                    \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times {format_rupiah(H).replace('Rp ', '')}
-                ''')
-                st.latex(fr'''
-                    \text{{Biaya Penyimpanan}} = {format_rupiah(biaya_penyimpanan)}
-                ''')
-                st.latex(fr'''
-                    \text{{Total Biaya}} = {format_rupiah(biaya_pemesanan).replace('Rp ', '')} + {format_rupiah(biaya_penyimpanan).replace('Rp ', '')}
-                ''')
-                st.latex(fr'''
-                    \text{{Total Biaya}} = {format_rupiah(total_biaya)}
-                ''')
-            else:
-                st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
-
         st.divider() # Garis pemisah visual
 
         # Ini code untuk membuat grafik visualisasi analisis biaya
@@ -372,4 +370,4 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
             """)
 
 st.markdown("---")
-st.markdown("Fauzi Aditya")
+st.markdown("Made with ❤️ using Streamlit.")
