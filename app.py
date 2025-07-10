@@ -64,9 +64,9 @@ meminimalkan total biaya, dan menganalisis bagaimana perubahan parameter memenga
 # Input dari pengguna di sidebar
 st.sidebar.header("⚙️ Input Parameter Persediaan")
 annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=1000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-# Mengubah nilai default untuk biaya pemesanan dan penyimpanan menjadi integer
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
+# Mengubah nilai default untuk biaya pemesanan dan penyimpanan menjadi float
+ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000.0, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000.0, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
 
 # Perhitungan
 if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
