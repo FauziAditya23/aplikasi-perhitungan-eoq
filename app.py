@@ -78,7 +78,7 @@ D_default = 35000
 S_default = 1000000 
 H_default = 200000 
 lead_time_default = 7 # Lead Time Pengiriman (hari) - Tetap
-safety_stock_default = 50 # Stok Pengaman (kg) - Lebih realistis
+safety_stock_default = 500 # Stok Pengaman (kg) - Lebih realistis
 
 # --- Kolom Panduan Aplikasi (di Sidebar) ---
 with st.sidebar:
