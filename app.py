@@ -56,7 +56,7 @@ def calculate_orders_per_year(D, Q):
     return orders
 
 # --- Konfigurasi Halaman Streamlit ---
-st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
+st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="�")
 
 # --- Header Utama Aplikasi ---
 st.markdown("<h1 style='text-align: center; font-size: 3em;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
