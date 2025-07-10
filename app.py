@@ -63,7 +63,8 @@ st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", 
 
 # --- Header Utama Aplikasi ---
 st.markdown("<h1 style='text-align: center; font-size: 3em;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
-# st.markdown("<h3 style='text-align: center; font-size: 1.8em;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True) # Dihapus
+# Menghapus subheader studi kasus
+# st.markdown("<h3 style='text-align: center; font-size: 1.8em;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True)
 
 st.markdown("""
 <div style="text-align: center; font-size: 1.1em;">
@@ -100,13 +101,15 @@ with col1:
 
     with sub_col1_1:
         with st.container(border=True):
-            st.markdown("<h4 style='color: #2874A6;'>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
-            D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=D_default, help="Jumlah total unit barang yang dibutuhkan dalam setahun.")
+            # Menghapus warna kustom dari header
+            st.markdown("<h4>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
+            D = st.number_input("Permintaan Tahunan (kg) �", min_value=1, value=D_default, help="Jumlah total unit barang yang dibutuhkan dalam setahun.")
             S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=S_default, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
             H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=H_default, help="Biaya untuk menyimpan satu kg barang selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
             
             st.markdown("---") # Pemisah dalam container
-            st.markdown("<h4 style='color: #2874A6;'>🛡️ Parameter Stok Pengaman & ROP</h4>", unsafe_allow_html=True)
+            # Menghapus warna kustom dari header
+            st.markdown("<h4>🛡️ Parameter Stok Pengaman & ROP</h4>", unsafe_allow_html=True)
             lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=lead_time_default, help="Jumlah hari antara pemesanan dan penerimaan barang.")
             safety_stock = st.number_input("Stok Pengaman (Safety Stock) (kg) 🚨", min_value=0, value=safety_stock_default, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan pengiriman.")
     
@@ -153,7 +156,8 @@ else:
 st.markdown("<br>", unsafe_allow_html=True) # Spasi sebelum tombol
 if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container_width=True):
     with col2:
-        st.markdown("<h2 style='color: #2E86C1;'>💡 Hasil dan Wawasan Bisnis</h2>", unsafe_allow_html=True)
+        # Menghapus warna kustom dari header
+        st.markdown("<h2>💡 Hasil dan Wawasan Bisnis</h2>", unsafe_allow_html=True)
         st.success(f"**Kebijakan Optimal:** Pesan **{eoq:.0f} kg** biji kopi setiap kali stok mencapai **{rop:.1f} kg**.")
         
         col1_res, col2_res = st.columns(2)
@@ -167,7 +171,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         st.divider() # Garis pemisah visual
 
         with st.container(border=True):
-            st.markdown("<h4 style='color: #2874A6;'>📊 Analisis Kebijakan Persediaan</h4>", unsafe_allow_html=True)
+            # Menghapus warna kustom dari header
+            st.markdown("<h4>📊 Analisis Kebijakan Persediaan</h4>", unsafe_allow_html=True)
             if eoq > 0:
                 if eoq > (D/4):
                     st.warning("- **Frekuensi Rendah:** Pesanan dalam jumlah besar tapi jarang. Ini hemat biaya pesan, tapi boros biaya simpan.")
@@ -180,8 +185,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         
         st.divider() # Garis pemisah visual
 
-        # Menambahkan bagian Proses Perhitungan
-        with st.expander("➕ Lihat Proses Perhitungan Lengkap", expanded=True): # Expanded by default
+        # Menambahkan bagian Proses Perhitungan di col2, hanya muncul setelah tombol diklik
+        with st.expander("➕ Lihat Proses Perhitungan Lengkap"): # Tidak expanded by default
             st.markdown("Berikut adalah langkah-langkah perhitungan berdasarkan input Anda:")
 
             st.markdown("#### 1. Perhitungan Economic Order Quantity (EOQ)")
@@ -274,7 +279,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         st.divider() # Garis pemisah visual
 
         # Ini code untuk membuat grafik visualisasi analisis biaya
-        st.markdown("<h4 style='color: #2874A6;'>📈 Visualisasi Analisis Biaya</h4>", unsafe_allow_html=True)
+        # Menghapus warna kustom dari header
+        st.markdown("<h4>📈 Visualisasi Analisis Biaya</h4>", unsafe_allow_html=True)
         if eoq > 0:
             q_min_plot = max(1, eoq * 0.1)
             q_max_plot = eoq * 2.5 # Memperluas rentang sedikit untuk melihat kurva lebih jelas
