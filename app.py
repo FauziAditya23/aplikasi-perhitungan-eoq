@@ -41,7 +41,7 @@ def calculate_orders_per_year(D, Q):
     orders = D / Q
     return orders
 
-st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="📈") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
+st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="�") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
 
 st.title("📦 Simulasi Sistem Persediaan Barang (EOQ Model)")
 st.markdown("""
@@ -140,18 +140,18 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         * $S$ = Biaya Pemesanan = Rp {ordering_cost:,.2f}
         * $H$ = Biaya Penyimpanan = Rp {holding_cost:,.2f}
         """)
-        st.latex(f'''
-            EOQ = \\sqrt{{\\frac{{2 \\times {annual_demand} \\times {ordering_cost:,.2f}}}{{{holding_cost:,.2f}}}}}
+        st.latex(fr'''
+            EOQ = \sqrt{{\frac{{2 \times {annual_demand} \times {ordering_cost:,.2f}}}{{{holding_cost:,.2f}}}}}
         ''')
-        st.latex(f'''
-            EOQ = \\sqrt{{\\frac{{{2 * annual_demand * ordering_cost:,.2f}}}{{{holding_cost:,.2f}}}}}
+        st.latex(fr'''
+            EOQ = \sqrt{{\frac{{{2 * annual_demand * ordering_cost:,.2f}}}{{{holding_cost:,.2f}}}}}
         ''')
         if holding_cost > 0:
-            st.latex(f'''
-                EOQ = \\sqrt{{{ (2 * annual_demand * ordering_cost) / holding_cost:,.2f}}}
+            st.latex(fr'''
+                EOQ = \sqrt{{{ (2 * annual_demand * ordering_cost) / holding_cost:,.2f}}}
             ''')
-            st.latex(f'''
-                EOQ = {eoq:,.2f} \\text{ unit}
+            st.latex(fr'''
+                EOQ = {eoq:,.2f} \text{{ unit}}
             ''')
         else:
             st.write("EOQ tak terhingga karena biaya penyimpanan adalah nol.")
@@ -171,23 +171,23 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         Dengan $Q = EOQ = {eoq:,.2f}$ unit:
         """)
         if np.isfinite(eoq) and eoq > 0:
-            st.latex(f'''
-                \\text{{Biaya Pemesanan}} = \\left(\\frac{{{annual_demand}}}{{{eoq:,.2f}}}\\right) \\times {ordering_cost:,.2f}
+            st.latex(fr'''
+                \text{{Biaya Pemesanan}} = \left(\frac{{{annual_demand}}}{{{eoq:,.2f}}}\right) \times {ordering_cost:,.2f}
             ''')
-            st.latex(f'''
-                \\text{{Biaya Pemesanan}} = { (annual_demand / eoq) * ordering_cost:,.2f}
+            st.latex(fr'''
+                \text{{Biaya Pemesanan}} = { (annual_demand / eoq) * ordering_cost:,.2f}
             ''')
-            st.latex(f'''
-                \\text{{Biaya Penyimpanan}} = \\left(\\frac{{{eoq:,.2f}}}{{2}}\\right) \\times {holding_cost:,.2f}
+            st.latex(fr'''
+                \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times {holding_cost:,.2f}
             ''')
-            st.latex(f'''
-                \\text{{Biaya Penyimpanan}} = { (eoq / 2) * holding_cost:,.2f}
+            st.latex(fr'''
+                \text{{Biaya Penyimpanan}} = { (eoq / 2) * holding_cost:,.2f}
             ''')
-            st.latex(f'''
-                \\text{{Total Biaya}} = {ordering_cost_at_eoq:,.2f} + {holding_cost_at_eoq:,.2f}
+            st.latex(fr'''
+                \text{{Total Biaya}} = {ordering_cost_at_eoq:,.2f} + {holding_cost_at_eoq:,.2f}
             ''')
-            st.latex(f'''
-                \\text{{Total Biaya}} = {total_cost_at_eoq:,.2f}
+            st.latex(fr'''
+                \text{{Total Biaya}} = {total_cost_at_eoq:,.2f}
             ''')
         else:
             st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
@@ -201,11 +201,11 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         Dengan $Q = EOQ = {eoq:,.2f}$ unit:
         """)
         if np.isfinite(eoq) and eoq > 0:
-            st.latex(f'''
-                \\text{{Jumlah Pemesanan per Tahun}} = \\frac{{{annual_demand}}}{{{eoq:,.2f}}}
+            st.latex(fr'''
+                \text{{Jumlah Pemesanan per Tahun}} = \frac{{{annual_demand}}}{{{eoq:,.2f}}}
             ''')
-            st.latex(f'''
-                \\text{{Jumlah Pemesanan per Tahun}} = {orders_per_year_at_eoq:,.2f} \\text{ kali}
+            st.latex(fr'''
+                \text{{Jumlah Pemesanan per Tahun}} = {orders_per_year_at_eoq:,.2f} \text{{ kali}}
             ''')
         else:
             st.write("Jumlah pemesanan per tahun tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
