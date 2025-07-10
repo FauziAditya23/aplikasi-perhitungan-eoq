@@ -73,12 +73,12 @@ sambil memastikan ketersediaan stok yang memadai. Mari kita optimalkan rantai pa
 st.divider() # Garis pemisah visual
 
 # --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk input) ---
-# Nilai default dipertahankan dari versi sebelumnya
-D_default = 5000
-S_default = 100000
-H_default = 500
-lead_time_default = 7
-safety_stock_default = 20
+# Nilai default diubah agar lebih realistis untuk perhitungan tahunan
+D_default = 3000 # Permintaan Tahunan (kg) - Contoh: 250 kg/bulan * 12 bulan
+S_default = 100000 # Biaya Pemesanan per Pesanan (Rp) - Tetap
+H_default = 2000 # Biaya Penyimpanan per kg per Tahun (Rp) - Lebih realistis
+lead_time_default = 7 # Lead Time Pengiriman (hari) - Tetap
+safety_stock_default = 50 # Stok Pengaman (kg) - Lebih realistis
 
 # --- Kolom Panduan Aplikasi (di Sidebar) ---
 with st.sidebar:
@@ -87,22 +87,22 @@ with st.sidebar:
     Aplikasi ini adalah simulator EOQ (Economic Order Quantity) dan ROP (Reorder Point) interaktif.
     Ikuti langkah-langkah di bawah untuk menggunakannya:
     
-    1.  **Atur Parameter Input:** Sesuaikan nilai "Permintaan Tahunan", "Biaya Pemesanan", "Biaya Penyimpanan", "Lead Time Pengiriman", dan "Stok Pengaman" di bagian "Parameter Model Input".
-    2.  **Pahami Rumus:** Buka bagian "Penjelasan Rumus Model" untuk melihat rumus yang digunakan dalam perhitungan.
-    3.  **Hitung Optimalisasi:** Klik tombol "✨ Hitung Optimalisasi Persediaan" untuk melihat hasil perhitungan optimal, analisis kebijakan, proses perhitungan lengkap, dan visualisasi grafik.
-    4.  **Analisis Hasil:** Tinjau "Hasil dan Wawasan Bisnis" serta grafik untuk memahami kebijakan persediaan yang optimal.
-    5.  **Lihat Detail Perhitungan:** Buka "Lihat Proses Perhitungan Lengkap" untuk melihat langkah demi langkah perhitungan.
+    1.  **Atur Parameter Input:** Sesuaikan nilai "Permintaan Tahunan", "Biaya Pemesanan", "Biaya Penyimpanan", "Lead Time Pengiriman", dan "Stok Pengaman" di bagian "Parameter Model Input" pada area utama.
+    2.  **Pahami Rumus:** Buka bagian "Penjelasan Rumus Model" di area utama untuk melihat rumus yang digunakan dalam perhitungan.
+    3.  **Hitung Optimalisasi:** Klik tombol "✨ Hitung Optimalisasi Persediaan" di area utama untuk melihat hasil perhitungan optimal, analisis kebijakan, proses perhitungan lengkap, dan visualisasi grafik.
+    4.  **Analisis Hasil:** Tinjau "Hasil dan Wawasan Bisnis" serta grafik yang muncul di bawah tombol untuk memahami kebijakan persediaan yang optimal.
+    5.  **Lihat Detail Perhitungan:** Buka "Lihat Proses Perhitungan Lengkap" untuk melihat langkah demi langkah perhitungan secara mendetail.
     """)
     st.info("Tips: Ubah parameter di setiap model untuk melihat bagaimana hasilnya berubah secara real-time!")
     
     st.markdown("---")
-    st.markdown("Tentang Saya:")
+    st.markdown("<h4>Tentang Saya:</h4>")
     st.markdown("""
-    **Nama:** [Nama Anda]
-    **Kelas:** [Kelas Anda]
-    **Kampus:** [Nama Kampus Anda]
+    **Nama:** [Masukkan Nama Anda Di Sini]
+    **Kelas:** [Masukkan Kelas Anda Di Sini]
+    **Kampus:** [Masukkan Nama Kampus Anda Di Sini]
     """)
- 
+
 # --- Area Utama Aplikasi (Input, Penjelasan Rumus, dan Tombol) ---
 st.markdown("""
 <div style="font-size: 1.1em;">
