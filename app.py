@@ -3,6 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd # Import pandas for table display
 
+def format_rupiah(value):
+    """
+    Memformat nilai numerik ke dalam format Rupiah dengan pemisah ribuan.
+    Menghilangkan .00 jika nilai adalah bilangan bulat.
+    """
+    if not np.isfinite(value):
+        return "Tak Terhingga"
+    if value == int(value):
+        return f"Rp {int(value):,}"
+    return f"Rp {value:,.2f}"
+
 def calculate_eoq(D, S, H):
     """
     Menghitung Economic Order Quantity (EOQ).
@@ -41,7 +52,7 @@ def calculate_orders_per_year(D, Q):
     orders = D / Q
     return orders
 
-st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="�") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
+st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="📈") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
 
 st.title("📦 Simulasi Sistem Persediaan Barang (EOQ Model)")
 st.markdown("""
@@ -53,9 +64,9 @@ meminimalkan total biaya, dan menganalisis bagaimana perubahan parameter memenga
 # Input dari pengguna di sidebar
 st.sidebar.header("⚙️ Input Parameter Persediaan")
 annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=1000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-# Mengubah nilai default untuk biaya pemesanan dan penyimpanan menjadi jutaan
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000.0, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000.0, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
+# Mengubah nilai default untuk biaya pemesanan dan penyimpanan menjadi bilangan bulat
+ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
 
 # Perhitungan
 if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
@@ -74,7 +85,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         st.metric("📦 Economic Order Quantity (EOQ)", f"{eoq:,.2f} unit" if np.isfinite(eoq) else "Tak Terhingga")
         st.caption("Jumlah pesanan optimal untuk meminimalkan total biaya persediaan.")
     with col2:
-        st.metric("💰 Total Biaya Persediaan (pada EOQ)", f"Rp {total_cost_at_eoq:,.2f}" if np.isfinite(total_cost_at_eoq) else "Tak Terhingga")
+        st.metric("💰 Total Biaya Persediaan (pada EOQ)", format_rupiah(total_cost_at_eoq))
         st.caption("Total biaya yang dikeluarkan jika memesan sejumlah EOQ.")
     with col3:
         st.metric("🔄 Jumlah Pemesanan per Tahun (pada EOQ)", f"{orders_per_year_at_eoq:,.2f} kali" if np.isfinite(orders_per_year_at_eoq) else "Tak Terhingga")
@@ -93,20 +104,20 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         orders_per_year_custom = calculate_orders_per_year(annual_demand, custom_order_quantity)
 
         st.write(f"Jika Anda memesan **{custom_order_quantity:,.0f} unit** per pesanan:")
-        st.metric("Total Biaya Persediaan Kustom", f"Rp {total_cost_custom:,.2f}" if np.isfinite(total_cost_custom) else "Tak Terhingga")
+        st.metric("Total Biaya Persediaan Kustom", format_rupiah(total_cost_custom))
         st.metric("Jumlah Pemesanan per Tahun Kustom", f"{orders_per_year_custom:,.2f} kali" if np.isfinite(orders_per_year_custom) else "Tak Terhingga")
 
         if np.isfinite(total_cost_at_eoq) and np.isfinite(total_cost_custom):
             if total_cost_custom > total_cost_at_eoq:
-                st.warning(f"⚠️ Total biaya kustom (Rp {total_cost_custom:,.2f}) lebih tinggi dari total biaya pada EOQ (Rp {total_cost_at_eoq:,.2f}).")
+                st.warning(f"⚠️ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih tinggi dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}).")
             elif total_cost_custom < total_cost_at_eoq:
-                st.success(f"✅ Total biaya kustom (Rp {total_cost_custom:,.2f}) lebih rendah dari total biaya pada EOQ (Rp {total_cost_at_eoq:,.2f}). Ini mungkin karena pembulatan atau nilai yang sangat dekat.")
+                st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) lebih rendah dari total biaya pada EOQ ({format_rupiah(total_cost_at_eoq)}). Ini mungkin karena pembulatan atau nilai yang sangat dekat.")
             else:
                 st.info("ℹ️ Total biaya kustom sama dengan total biaya pada EOQ.")
         elif np.isfinite(total_cost_custom) and not np.isfinite(total_cost_at_eoq):
-             st.success(f"✅ Total biaya kustom (Rp {total_cost_custom:,.2f}) adalah nilai yang terhingga, sedangkan EOQ memiliki biaya tak terhingga.")
+             st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) adalah nilai yang terhingga, sedangkan EOQ memiliki biaya tak terhingga.")
         elif not np.isfinite(total_cost_custom) and np.isfinite(total_cost_at_eoq):
-             st.warning(f"⚠️ Total biaya kustom adalah tak terhingga, sedangkan EOQ memiliki biaya terhingga (Rp {total_cost_at_eoq:,.2f}).")
+             st.warning(f"⚠️ Total biaya kustom adalah tak terhingga, sedangkan EOQ memiliki biaya terhingga ({format_rupiah(total_cost_at_eoq)}).")
         else:
              st.info("ℹ️ Baik total biaya kustom maupun total biaya pada EOQ adalah tak terhingga.")
 
@@ -118,7 +129,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         "Metrik": ["Economic Order Quantity (EOQ)", "Total Biaya Persediaan (pada EOQ)", "Jumlah Pemesanan per Tahun (pada EOQ)"],
         "Nilai": [
             f"{eoq:,.2f} unit" if np.isfinite(eoq) else "Tak Terhingga",
-            f"Rp {total_cost_at_eoq:,.2f}" if np.isfinite(total_cost_at_eoq) else "Tak Terhingga",
+            format_rupiah(total_cost_at_eoq),
             f"{orders_per_year_at_eoq:,.2f} kali" if np.isfinite(orders_per_year_at_eoq) else "Tak Terhingga"
         ]
     }
@@ -138,8 +149,8 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         st.markdown(f"""
         Di mana:
         * $D$ = Permintaan Tahunan = {annual_demand} unit
-        * $S$ = Biaya Pemesanan = Rp {ordering_cost:,.2f}
-        * $H$ = Biaya Penyimpanan = Rp {holding_cost:,.2f}
+        * $S$ = Biaya Pemesanan = {format_rupiah(ordering_cost)}
+        * $H$ = Biaya Penyimpanan = {format_rupiah(holding_cost)}
         """)
         st.latex(fr'''
             EOQ = \sqrt{{\frac{{2 \times {annual_demand} \times {ordering_cost:,.2f}}}{{{holding_cost:,.2f}}}}}
@@ -173,22 +184,22 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         """)
         if np.isfinite(eoq) and eoq > 0:
             st.latex(fr'''
-                \text{{Biaya Pemesanan}} = \left(\frac{{{annual_demand}}}{{{eoq:,.2f}}}\right) \times \text{{Rp }} {ordering_cost:,.2f}
+                \text{{Biaya Pemesanan}} = \left(\frac{{{annual_demand}}}{{{eoq:,.2f}}}\right) \times {format_rupiah(ordering_cost).replace('Rp ', '')}
             ''')
             st.latex(fr'''
-                \text{{Biaya Pemesanan}} = \text{{Rp }} { (annual_demand / eoq) * ordering_cost:,.2f}
+                \text{{Biaya Pemesanan}} = {format_rupiah((annual_demand / eoq) * ordering_cost)}
             ''')
             st.latex(fr'''
-                \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times \text{{Rp }} {holding_cost:,.2f}
+                \text{{Biaya Penyimpanan}} = \left(\frac{{{eoq:,.2f}}}{{2}}\right) \times {format_rupiah(holding_cost).replace('Rp ', '')}
             ''')
             st.latex(fr'''
-                \text{{Biaya Penyimpanan}} = \text{{Rp }} { (eoq / 2) * holding_cost:,.2f}
+                \text{{Biaya Penyimpanan}} = {format_rupiah((eoq / 2) * holding_cost)}
             ''')
             st.latex(fr'''
-                \text{{Total Biaya}} = \text{{Rp }} {ordering_cost_at_eoq:,.2f} + \text{{Rp }} {holding_cost_at_eoq:,.2f}
+                \text{{Total Biaya}} = {format_rupiah(ordering_cost_at_eoq).replace('Rp ', '')} + {format_rupiah(holding_cost_at_eoq).replace('Rp ', '')}
             ''')
             st.latex(fr'''
-                \text{{Total Biaya}} = \text{{Rp }} {total_cost_at_eoq:,.2f}
+                \text{{Total Biaya}} = {format_rupiah(total_cost_at_eoq)}
             ''')
         else:
             st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
@@ -269,7 +280,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         for d_var in demand_variations:
             eoq_var = calculate_eoq(d_var, ordering_cost, holding_cost)
             _, _, total_cost_var = calculate_total_inventory_cost(d_var, ordering_cost, holding_cost, eoq_var)
-            sensitivity_data_D.append({"Permintaan (D)": f"{d_var:,.0f}", "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": f"Rp {total_cost_var:,.2f}" if np.isfinite(total_cost_var) else "Tak Terhingga"})
+            sensitivity_data_D.append({"Permintaan (D)": f"{d_var:,.0f}", "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": format_rupiah(total_cost_var)})
         df_sensitivity_D = pd.DataFrame(sensitivity_data_D)
         st.dataframe(df_sensitivity_D)
 
@@ -279,7 +290,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         for s_var in ordering_cost_variations:
             eoq_var = calculate_eoq(annual_demand, s_var, holding_cost)
             _, _, total_cost_var = calculate_total_inventory_cost(annual_demand, s_var, holding_cost, eoq_var)
-            sensitivity_data_S.append({"Biaya Pemesanan (S)": f"Rp {s_var:,.2f}", "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": f"Rp {total_cost_var:,.2f}" if np.isfinite(total_cost_var) else "Tak Terhingga"})
+            sensitivity_data_S.append({"Biaya Pemesanan (S)": format_rupiah(s_var), "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": format_rupiah(total_cost_var)})
         df_sensitivity_S = pd.DataFrame(sensitivity_data_S)
         st.dataframe(df_sensitivity_S)
 
@@ -290,10 +301,10 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
             if h_var > 0: # Pastikan biaya penyimpanan tidak nol untuk perhitungan EOQ
                 eoq_var = calculate_eoq(annual_demand, ordering_cost, h_var)
                 _, _, total_cost_var = calculate_total_inventory_cost(annual_demand, ordering_cost, h_var, eoq_var)
-                sensitivity_data_H.append({"Biaya Penyimpanan (H)": f"Rp {h_var:,.2f}", "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": f"Rp {total_cost_var:,.2f}" if np.isfinite(total_cost_var) else "Tak Terhingga"})
+                sensitivity_data_H.append({"Biaya Penyimpanan (H)": format_rupiah(h_var), "EOQ": f"{eoq_var:,.2f}" if np.isfinite(eoq_var) else "Tak Terhingga", "Total Biaya": format_rupiah(total_cost_var)})
             else:
-                sensitivity_data_H.append({"Biaya Penyimpanan (H)": f"Rp {h_var:,.2f}", "EOQ": "Tak Terhingga", "Total Biaya": "Tak Terhingga"})
-        df_sensitivity_H = pd.DataFrame(sensitivity_data_H)
+                sensitivity_data_H.append({"Biaya Penyimpanan (H)": format_rupiah(h_var), "EOQ": "Tak Terhingga", "Total Biaya": "Tak Terhingga"})
+        df_sensitivity_H = pd.DataFrame(sensitivity_H)
         st.dataframe(df_sensitivity_H)
 
     st.markdown("---") # Garis pemisah
