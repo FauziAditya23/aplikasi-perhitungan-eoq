@@ -74,11 +74,11 @@ st.divider() # Garis pemisah visual
 
 # --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk input) ---
 # Nilai default diubah agar lebih realistis untuk perhitungan tahunan
-D_default = 40000
-S_default = 550000 
-H_default = 20000 
+D_default = 150000
+S_default = 7500000 
+H_default = 25000 
 lead_time_default = 10 # Lead Time Pengiriman (hari) - Tetap
-safety_stock_default = 300 # Stok Pengaman (kg) - Lebih realistis
+safety_stock_default = 500 # Stok Pengaman (kg) - Lebih realistis
 
 # --- Kolom Panduan Aplikasi (di Sidebar) ---
 with st.sidebar:
