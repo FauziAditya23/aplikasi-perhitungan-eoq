@@ -164,11 +164,11 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
             else:
                 st.info("ℹ️ Total biaya kustom sama dengan total biaya pada EOQ.")
         elif np.isfinite(total_cost_custom) and not np.isfinite(total_cost_at_eoq):
-             st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) adalah nilai yang terhingga, sedangkan EOQ memiliki biaya tak terhingga.")
+            st.success(f"✅ Total biaya kustom ({format_rupiah(total_cost_custom)}) adalah nilai yang terhingga, sedangkan EOQ memiliki biaya tak terhingga.")
         elif not np.isfinite(total_cost_custom) and np.isfinite(total_cost_at_eoq):
-             st.warning(f"⚠️ Total biaya kustom adalah tak terhingga, sedangkan EOQ memiliki biaya terhingga ({format_rupiah(total_cost_at_eoq)}).")
+            st.warning(f"⚠️ Total biaya kustom adalah tak terhingga, sedangkan EOQ memiliki biaya terhingga ({format_rupiah(total_cost_at_eoq)}).")
         else:
-             st.info("ℹ️ Baik total biaya kustom maupun total biaya pada EOQ adalah tak terhingga.")
+            st.info("ℹ️ Baik total biaya kustom maupun total biaya pada EOQ adalah tak terhingga.")
 
 
     st.markdown("---") # Garis pemisah
@@ -290,7 +290,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         ''')
         st.markdown(f"""
         Di mana:
-        st.latex(fr'''\text{{Z-score}} = {z_score:,.2f}''')
+        * $\text{{Z-score}} = {z_score:,.2f}$
         * $\text{{Std Dev Permintaan Harian}}$ = {std_dev_daily_demand:,.2f} unit
         * $\text{{Waktu Tunggu}}$ = {lead_time_days} hari
         """)
@@ -332,58 +332,74 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
 
     # Buat rentang kuantitas pesanan untuk grafik
     # Pastikan rentang mencakup EOQ dan kuantitas kustom, dan selalu terhingga
-    max_q_value = annual_demand * 2 # Base value
+    min_q_plot = 1 # Minimum order quantity for the plot
     if np.isfinite(eoq) and eoq > 0:
-        max_q_value = max(max_q_value, eoq * 1.5)
+        # Set max_q_value to be around 2.5 times EOQ to show the curve clearly
+        # But also ensure it's at least 1.5 times the custom quantity if that's larger
+        max_q_value_base = eoq * 2.5
+    else:
+        # If EOQ is infinite or zero, base it on annual demand or a fixed large value
+        max_q_value_base = annual_demand * 0.5 if annual_demand > 0 else 1000
+
     if np.isfinite(custom_order_quantity) and custom_order_quantity > 0:
-        max_q_value = max(max_q_value, custom_order_quantity * 1.5)
-    
-    # Pastikan min_value untuk linspace adalah setidaknya 1 untuk menghindari masalah
-    q_values = np.linspace(1, max_q_value, 500)
-    
-    ordering_costs_plot = [(annual_demand / q) * ordering_cost for q in q_values]
-    holding_costs_plot = [(q / 2) * holding_cost for q in q_values]
-    total_costs_plot = [oc + hc for oc, hc in zip(ordering_costs_plot, holding_costs_plot)]
+        max_q_value_base = max(max_q_value_base, custom_order_quantity * 1.5)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Reorder plot calls to match the desired legend order: Biaya Penyimpanan, Biaya Pemesanan, Total Biaya
-    ax.plot(q_values, holding_costs_plot, label="Biaya Penyimpanan", color='blue') # Blue for Holding Cost
-    ax.plot(q_values, ordering_costs_plot, label="Biaya Pemesanan", color='green') # Green for Ordering Cost
-    ax.plot(q_values, total_costs_plot, label="Total Biaya", color='red', linewidth=2) # Red for Total Cost
+    # Ensure a reasonable upper bound for the plot, not excessively large
+    max_q_plot = max(50, int(max_q_value_base)) # Ensure it's at least 50 units for a visible curve
 
-    if np.isfinite(eoq) and eoq > 0:
-        ax.axvline(eoq, color='purple', linestyle='--', label=f'EOQ') # Purple dashed line for EOQ
-        # Add annotation for lowest cost point
-        if np.isfinite(total_cost_at_eoq):
-            ax.annotate(f'Biaya Terendah\n{format_rupiah(total_cost_at_eoq)}',
-                        xy=(eoq, total_cost_at_eoq),
-                        # Adjust xytext and arrowprops for better positioning and appearance
-                        xytext=(eoq + max_q_value * 0.15, total_cost_at_eoq + total_cost_at_eoq * 0.1),
-                        arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=8, headlength=8),
-                        horizontalalignment='left', verticalalignment='bottom',
-                        bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=0.5, alpha=0.9))
-    
-    if np.isfinite(custom_order_quantity) and custom_order_quantity > 0:
-        ax.axvline(custom_order_quantity, color='#FFD700', linestyle=':', label=f'Kuantitas Kustom: {custom_order_quantity:,.0f}') # Gold
-    
-    ax.set_xlabel("Kuantitas Pemesanan (unit)") # Changed label to match image
-    ax.set_ylabel("Biaya Tahunan (Rp)") # Changed label to match image
-    ax.set_title("Analisis Biaya Persediaan (EOQ)") # Changed title to match image
-    ax.legend()
-    ax.grid(True, linestyle='-', alpha=0.7) # Changed grid style to solid line
-    ax.set_ylim(bottom=0) # Memastikan sumbu y dimulai dari 0
-    st.pyplot(fig)
+    q_values = np.linspace(min_q_plot, max_q_plot, 500)
 
-    st.markdown("""
-    **Penjelasan Grafik:**
-    * **Garis Biru (Biaya Penyimpanan):** Meningkat seiring bertambahnya kuantitas pesanan, karena Anda menyimpan lebih banyak persediaan.
-    * **Garis Hijau (Biaya Pemesanan):** Menurun seiring bertambahnya kuantitas pesanan, karena Anda memesan lebih jarang.
-    * **Garis Merah (Total Biaya):** Menunjukkan jumlah dari biaya pemesanan dan biaya penyimpanan. Titik terendah pada garis ini adalah EOQ.
-    * **Garis Ungu Putus-putus (EOQ):** Menunjukkan kuantitas pesanan optimal di mana total biaya persediaan berada pada titik terendah. (Hanya ditampilkan jika EOQ terhingga)
-    * **Anotasi Biaya Terendah:** Menunjukkan titik biaya total minimum pada EOQ.
-    * **Garis Oranye Titik-titik (Kuantitas Kustom):** Menunjukkan posisi kuantitas pesanan kustom Anda pada grafik. (Hanya ditampilkan jika kuantitas kustom terhingga)
-    """)
+    # Filter out non-positive or non-finite q_values if any, though linspace should handle this if min_q_plot is > 0
+    q_values = q_values[q_values > 0]
+    if not np.any(q_values): # Handle case where q_values might become empty after filtering
+        st.warning("Tidak dapat membuat plot biaya karena rentang kuantitas pesanan tidak valid.")
+    else:
+        ordering_costs_plot = [(annual_demand / q) * ordering_cost for q in q_values]
+        holding_costs_plot = [(q / 2) * holding_cost for q in q_values]
+        total_costs_plot = [oc + hc for oc, hc in zip(ordering_costs_plot, holding_costs_plot)]
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        
+        # Reorder plot calls to match the desired legend order: Biaya Penyimpanan, Biaya Pemesanan, Total Biaya
+        ax.plot(q_values, holding_costs_plot, label="Biaya Penyimpanan", color='blue') # Blue for Holding Cost
+        ax.plot(q_values, ordering_costs_plot, label="Biaya Pemesanan", color='green') # Green for Ordering Cost
+        ax.plot(q_values, total_costs_plot, label="Total Biaya", color='red', linewidth=2) # Red for Total Cost
+
+        if np.isfinite(eoq) and eoq > 0:
+            ax.axvline(eoq, color='purple', linestyle='--', label=f'EOQ: {eoq:,.2f} unit') # Purple dashed line for EOQ
+            # Add annotation for lowest cost point
+            if np.isfinite(total_cost_at_eoq):
+                ax.annotate(f'Biaya Terendah\n{format_rupiah(total_cost_at_eoq)}',
+                            xy=(eoq, total_cost_at_eoq),
+                            # Adjust xytext and arrowprops for better positioning and appearance
+                            xytext=(eoq + max_q_plot * 0.05, total_cost_at_eoq + total_cost_at_eoq * 0.1),
+                            arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=8, headlength=8),
+                            horizontalalignment='left', verticalalignment='bottom',
+                            bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=0.5, alpha=0.9))
+        
+        if np.isfinite(custom_order_quantity) and custom_order_quantity > 0:
+            # Check if custom_order_quantity is within the plot's x-limits to avoid drawing outside
+            if custom_order_quantity >= min_q_plot and custom_order_quantity <= max_q_plot:
+                ax.axvline(custom_order_quantity, color='#FFD700', linestyle=':', label=f'Kuantitas Kustom: {custom_order_quantity:,.0f} unit') # Gold
+        
+        ax.set_xlabel("Kuantitas Pemesanan (unit)") # Changed label to match image
+        ax.set_ylabel("Biaya Tahunan (Rp)") # Changed label to match image
+        ax.set_title("Analisis Biaya Persediaan (EOQ)") # Changed title to match image
+        ax.legend()
+        ax.grid(True, linestyle='-', alpha=0.7) # Changed grid style to solid line
+        ax.set_ylim(bottom=0) # Memastikan sumbu y dimulai dari 0
+        ax.set_xlim(left=min_q_plot) # Ensure x-axis starts from min_q_plot
+        st.pyplot(fig)
+
+        st.markdown("""
+        **Penjelasan Grafik:**
+        * **Garis Biru (Biaya Penyimpanan):** Meningkat seiring bertambahnya kuantitas pesanan, karena Anda menyimpan lebih banyak persediaan.
+        * **Garis Hijau (Biaya Pemesanan):** Menurun seiring bertambahnya kuantitas pesanan, karena Anda memesan lebih jarang.
+        * **Garis Merah (Total Biaya):** Menunjukkan jumlah dari biaya pemesanan dan biaya penyimpanan. Titik terendah pada garis ini adalah EOQ.
+        * **Garis Ungu Putus-putus (EOQ):** Menunjukkan kuantitas pesanan optimal di mana total biaya persediaan berada pada titik terendah. (Hanya ditampilkan jika EOQ terhingga)
+        * **Anotasi Biaya Terendah:** Menunjukkan titik biaya total minimum pada EOQ.
+        * **Garis Emas Titik-titik (Kuantitas Kustom):** Menunjukkan posisi kuantitas pesanan kustom Anda pada grafik. (Hanya ditampilkan jika kuantitas kustom terhingga dan berada dalam rentang plot)
+        """)
 
     st.markdown("---") # Garis pemisah
 
