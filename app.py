@@ -74,9 +74,9 @@ st.divider() # Garis pemisah visual
 
 # --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk input) ---
 # Nilai default diubah agar lebih realistis untuk perhitungan tahunan
-D_default = 3000 # Permintaan Tahunan (kg) - Contoh: 250 kg/bulan * 12 bulan
-S_default = 1000000 # Biaya Pemesanan per Pesanan (Rp) - Tetap
-H_default = 2000 # Biaya Penyimpanan per kg per Tahun (Rp) - Lebih realistis
+D_default = 35000
+S_default = 1000000 
+H_default = 200000 
 lead_time_default = 7 # Lead Time Pengiriman (hari) - Tetap
 safety_stock_default = 50 # Stok Pengaman (kg) - Lebih realistis
 
