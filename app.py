@@ -57,10 +57,10 @@ def calculate_orders_per_year(D, Q):
 # Fungsi calculate_safety_stock dan calculate_reorder_point tidak digunakan
 # karena safety_stock adalah input langsung dalam antarmuka ini.
 
-st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
+st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="�")
 
 st.title("📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)")
-st.subheader("Studi Kasus: Kedai Kopi 'Kopi Kita'")
+# st.subheader("Studi Kasus: Kedai Kopi 'Kopi Kita'") # Dihapus
 
 st.markdown("""
 Selamat datang di alat simulasi interaktif untuk **Economic Order Quantity (EOQ)** dan **Reorder Point (ROP)**!
@@ -74,23 +74,21 @@ col1, col2 = st.columns([1.5, 2])
 
 with col1:
     st.markdown("""
-    **Skenario Bisnis:**
-    'Kopi Kita' adalah kedai kopi yang sedang berkembang dan menghadapi tantangan dalam mengelola persediaan biji kopi impor.
-    Tujuan utama adalah menentukan jumlah pesanan biji kopi yang paling efisien untuk meminimalkan total biaya persediaan,
-    yang mencakup biaya pemesanan dan biaya penyimpanan.
+    Aplikasi ini memungkinkan Anda untuk menganalisis dan mengoptimalkan kebijakan persediaan dengan menyesuaikan
+    parameter permintaan, biaya pemesanan, biaya penyimpanan, waktu tunggu, dan stok pengaman.
     """)
     
     with st.container(border=True):
         st.header("⚙️ Parameter Model Input")
         # Nilai default disesuaikan kembali ke versi 'Kopi Kita'
-        D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=1200, help="Jumlah total unit biji kopi yang dibutuhkan dalam setahun.")
+        D = st.number_input("Permintaan Tahunan (unit) 📈", min_value=1, value=1200, help="Jumlah total unit yang dibutuhkan dalam setahun.") # Label diubah
         S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=500000, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
-        H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=25000, help="Biaya untuk menyimpan satu kg biji kopi selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
+        H = st.number_input("Biaya Penyimpanan per unit per Tahun (Rp) 🏦", min_value=0, value=25000, help="Biaya untuk menyimpan satu unit barang selama setahun (misalnya biaya gudang, asuransi, kerusakan).") # Label diubah
         
         st.markdown("---") # Pemisah dalam container
         st.subheader("🛡️ Parameter Stok Pengaman & ROP")
-        lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=14, help="Jumlah hari antara pemesanan dan penerimaan biji kopi.")
-        safety_stock = st.number_input("Stok Pengaman (Safety Stock) (kg) 🚨", min_value=0, value=10, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan pengiriman.")
+        lead_time = st.number_input("Lead Time Pengiriman (hari) ⏳", min_value=1, value=14, help="Jumlah hari antara pemesanan dan penerimaan barang.")
+        safety_stock = st.number_input("Stok Pengaman (Safety Stock) (unit) 🚨", min_value=0, value=10, help="Stok tambahan yang dijaga untuk mengantisipasi ketidakpastian permintaan atau keterlambatan.") # Label diubah
     
     with st.expander("📚 Penjelasan Rumus Model: Economic Order Quantity (EOQ)"):
         st.markdown("""
@@ -136,12 +134,12 @@ else:
 if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
     with col2:
         st.header("💡 Hasil dan Wawasan Bisnis")
-        st.success(f"**Kebijakan Optimal untuk 'Kopi Kita':** Pesan **{eoq:.0f} kg** biji kopi setiap kali stok mencapai **{rop:.1f} kg**.")
+        st.success(f"**Kebijakan Optimal:** Pesan **{eoq:.0f} unit** setiap kali stok mencapai **{rop:.1f} unit**.") # Label diubah
         
         col1_res, col2_res = st.columns(2)
         with col1_res:
-            st.metric(label="📦 Kuantitas Pesanan Optimal (EOQ)", value=f"{eoq:.0f} kg")
-            st.metric(label="🎯 Titik Pemesanan Ulang (ROP)", value=f"{rop:.1f} kg")
+            st.metric(label="📦 Kuantitas Pesanan Optimal (EOQ)", value=f"{eoq:.0f} unit") # Label diubah
+            st.metric(label="🎯 Titik Pemesanan Ulang (ROP)", value=f"{rop:.1f} unit") # Label diubah
         with col2_res:
             st.metric(label="💰 Total Biaya Persediaan Tahunan", value=f"Rp {total_biaya:,.0f}")
             st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.1f} hari")
@@ -184,14 +182,14 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
             ax.plot(q, ordering_costs, 'g-', label='Biaya Pemesanan')
             ax.plot(q, total_costs, 'r-', linewidth=3, label='Total Biaya')
             if eoq > 0 and np.isfinite(total_biaya):
-                ax.axvline(x=eoq, color='purple', linestyle='--', label=f'EOQ: {eoq:,.2f} kg')
+                ax.axvline(x=eoq, color='purple', linestyle='--', label=f'EOQ: {eoq:,.2f} unit') # Label diubah
                 ax.annotate(f'Biaya Terendah\nRp {total_biaya:,.0f}', xy=(eoq, total_biaya), 
                             xytext=(eoq * 1.1, total_biaya * 1.1), # Menyesuaikan posisi teks relatif
                             arrowprops=dict(facecolor='black', shrink=0.05, width=1, headwidth=8, headlength=8),
                             horizontalalignment='left', verticalalignment='bottom',
                             bbox=dict(boxstyle="round,pad=0.3", fc="white", ec="black", lw=0.5, alpha=0.9))
 
-            ax.set_xlabel('Kuantitas Pemesanan (kg)')
+            ax.set_xlabel('Kuantitas Pemesanan (unit)') # Label diubah
             ax.set_ylabel('Biaya Tahunan (Rp)')
             ax.set_title('Analisis Biaya Persediaan (EOQ)', fontsize=16)
             ax.legend()
@@ -226,8 +224,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
                 stok_level.append(max(stok, safety_stock)) 
                 
             ax2.plot(t, stok_level, label='Tingkat Persediaan')
-            ax2.axhline(y=rop, color='orange', linestyle='--', label=f'ROP ({rop:.1f} kg)')
-            ax2.axhline(y=safety_stock, color='red', linestyle=':') # Fixed syntax error here
+            ax2.axhline(y=rop, color='orange', linestyle='--', label=f'ROP ({rop:.1f} unit)') # Label diubah
+            ax2.axhline(y=safety_stock, color='red', linestyle=':', label=f'Stok Pengaman ({safety_stock} unit)') # Label diubah
             
             if permintaan_harian > 0:
                 # Menambahkan titik pemesanan ulang pada grafik
@@ -253,7 +251,7 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary"):
 
 
         ax2.set_xlabel('Waktu (Hari)')
-        ax2.set_ylabel('Jumlah Stok (kg)')
+        ax2.set_ylabel('Jumlah Stok (unit)') # Label diubah
         ax2.set_title('Simulasi Siklus Persediaan', fontsize=16)
         ax2.legend()
         ax2.grid(True)
