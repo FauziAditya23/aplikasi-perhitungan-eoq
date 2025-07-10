@@ -290,7 +290,7 @@ if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
         ''')
         st.markdown(f"""
         Di mana:
-        * $Z\text{-score}$ = {z_score:,.2f}
+        st.latex(fr'''\text{{Z-score}} = {z_score:,.2f}''')
         * $\text{{Std Dev Permintaan Harian}}$ = {std_dev_daily_demand:,.2f} unit
         * $\text{{Waktu Tunggu}}$ = {lead_time_days} hari
         """)
