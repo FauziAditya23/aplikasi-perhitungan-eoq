@@ -41,7 +41,7 @@ def calculate_orders_per_year(D, Q):
     orders = D / Q
     return orders
 
-st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="📈") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
+st.set_page_config(layout="wide", page_title="EOQ Simulator", page_icon="�") # Mengatur layout halaman menjadi lebar dan menambahkan ikon/judul
 
 st.title("📦 Simulasi Sistem Persediaan Barang (EOQ Model)")
 st.markdown("""
@@ -53,8 +53,9 @@ meminimalkan total biaya, dan menganalisis bagaimana perubahan parameter memenga
 # Input dari pengguna di sidebar
 st.sidebar.header("⚙️ Input Parameter Persediaan")
 annual_demand = st.sidebar.number_input("Permintaan Tahunan (D) 📈", min_value=1, value=1000, help="Jumlah total unit yang dibutuhkan dalam setahun.")
-ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=50.0, help="Biaya tetap untuk setiap kali melakukan pemesanan.")
-holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) �", min_value=0.01, value=5.0, help="Biaya untuk menyimpan satu unit barang selama setahun (misal: biaya sewa gudang, asuransi, dll.).")
+# Mengubah nilai default untuk biaya pemesanan dan penyimpanan menjadi jutaan
+ordering_cost = st.sidebar.number_input("Biaya Pemesanan (S) (Rp) 💸", min_value=0.01, value=5000000.0, help="Biaya tetap untuk setiap kali melakukan pemesanan dalam Rupiah.")
+holding_cost = st.sidebar.number_input("Biaya Penyimpanan (H) (Rp) 🏦", min_value=0.01, value=50000.0, help="Biaya untuk menyimpan satu unit barang selama setahun dalam Rupiah.")
 
 # Perhitungan
 if st.sidebar.button("✨ Hitung EOQ dan Analisis"):
