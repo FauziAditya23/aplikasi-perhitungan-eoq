@@ -87,7 +87,7 @@ yang harus dipesan setiap kali (EOQ) dan kapan harus melakukan pemesanan ulang (
 Berikut adalah asumsi data yang lebih realistis untuk 'Benang Emas' berdasarkan operasi tahunan yang besar:
 <ul>
     <li><strong>Permintaan Tahunan (D):</strong> Pabrik ini membutuhkan sekitar 250.000 kg benang katun per tahun.</li>
-    <li><strong>Biaya Pemesanan (S):</strong> Setiap kali melakukan pemesanan, termasuk biaya administrasi, inspeksi kualitas, dan transportasi untuk pengiriman besar, diperkirakan mencapai Rp 10.000.000.</li>
+    <li><strong>Biaya Pemesanan (S):</strong> Setiap kali melakukan pemesanan, termasuk biaya administrasi, inspeksi kualitas, dan transportasi untuk pengiriman besar, diperkirakan mencapai Rp 54.000.000.</li>
     <li><strong>Biaya Penyimpanan (H):</strong> Biaya untuk menyimpan 1 kg benang katun selama setahun (termasuk biaya gudang, asuransi, risiko kerusakan/penyusutan) diperkirakan Rp 30.000.</li>
     <li><strong>Lead Time Pengiriman (Lead Time):</strong> Waktu yang dibutuhkan dari pemesanan hingga benang tiba di gudang adalah 7 hari.</li>
     <li><strong>Stok Pengaman (Safety Stock):</strong> Untuk mengantisipasi fluktuasi permintaan produksi atau keterlambatan pengiriman dari pemasok, 'Benang Emas' menjaga stok pengaman sebesar 150 kg.</li>
@@ -101,7 +101,7 @@ st.divider() # Garis pemisah visual
 # --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk input) ---
 # Nilai default diubah agar lebih realistis untuk perhitungan tahunan dengan biaya yang lebih besar (ratusan juta)
 D_default = 250000 # Permintaan Tahunan (kg) - Contoh: 250.000 kg benang katun per tahun
-S_default = 10000000 # Biaya Pemesanan per Pesanan (Rp) - Disesuaikan menjadi Rp 10.000.000
+S_default = 54000000 # Biaya Pemesanan per Pesanan (Rp) - Disesuaikan menjadi Rp 54.000.000 untuk frekuensi seimbang
 H_default = 30000 # Biaya Penyimpanan per kg per Tahun (Rp) - Disesuaikan menjadi Rp 30.000 per kg per tahun
 lead_time_default = 7 # Lead Time Pengiriman (hari) - Disesuaikan untuk skenario industri
 safety_stock_default = 150 # Stok Pengaman (kg) - Disesuaikan agar ROP lebih rendah
@@ -223,13 +223,19 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
     with st.container(border=True):
         st.markdown("<h4>📊 Analisis Kebijakan Persediaan</h4>", unsafe_allow_html=True)
         if eoq > 0:
-            if eoq > (D/4):
-                st.warning("- **Frekuensi Rendah:** Pesanan dalam jumlah besar tapi jarang. Ini hemat biaya pesan, tapi boros biaya simpan.")
-            elif eoq < (D/12):
+            # Mengubah kondisi untuk "Frekuensi Seimbang" agar lebih akurat
+            # D/12 dan D/4 adalah batas umum untuk frekuensi tinggi/rendah
+            # EOQ optimal berada di tengah-tengah
+            if eoq < (D / 15): # Jika EOQ sangat kecil, frekuensi sangat tinggi
+                st.warning("- **Frekuensi Sangat Tinggi:** Pesanan dalam jumlah sangat kecil tapi sangat sering. Ini bisa meningkatkan biaya administrasi dan logistik secara signifikan.")
+            elif eoq < (D / 8): # Jika EOQ kecil, frekuensi tinggi
                 st.info("- **Frekuensi Tinggi:** Pesanan dalam jumlah kecil tapi sering. Ini hemat biaya simpan, tapi boros biaya administrasi pemesanan.")
+            elif eoq > (D / 3): # Jika EOQ sangat besar, frekuensi sangat rendah
+                st.warning("- **Frekuensi Sangat Rendah:** Pesanan dalam jumlah sangat besar tapi sangat jarang. Ini bisa meningkatkan biaya penyimpanan dan risiko kerusakan/kadaluarsa.")
+            elif eoq > (D / 5): # Jika EOQ besar, frekuensi rendah
+                st.info("- **Frekuensi Rendah:** Pesanan dalam jumlah besar tapi jarang. Ini hemat biaya pesan, tapi boros biaya simpan.")
             else:
-                # Mengubah teks agar lebih eksplisit menyatakan "Frekuensi Seimbang"
-                st.success("- **Frekuensi Seimbang:** Kuantitas pesanan Anda menyeimbangkan biaya pesan dan biaya simpan dengan baik.")
+                st.success("- **Frekuensi Seimbang:** Kuantitas pesanan Anda menyeimbangkan biaya pesan dan biaya simpan dengan optimal. Ini adalah kebijakan yang paling efisien.")
         else:
             st.info("- Tidak ada analisis kebijakan yang tersedia karena EOQ tidak valid (biaya penyimpanan atau permintaan tahunan nol).")
     
