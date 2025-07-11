@@ -435,4 +435,4 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         """)
 
 st.markdown("---")
-st.markdown("Made with ❤️ using Streamlit.")
+st.markdown("UAS Matematika Terapan")
