@@ -122,11 +122,11 @@ with st.sidebar:
     st.info("Tips: Ubah parameter di setiap model untuk melihat bagaimana hasilnya berubah secara real-time!")
     
     st.markdown("---")
-    st.markdown("<h4>Tentang Saya:</h4>")
+    st.markdown("Tentang Saya:")
     st.markdown("""
-    **Nama:** Fauzi Aditya
-    **Kelas:** TI.24.C2
-    **Prodi:** Teknik Informatika
+    **Nama:** Fauzi Aditya \n
+    **Kelas:** TI.24.C2 \n
+    **Prodi:** Teknik Informatika \n
     **Kampus:** Universitas Pelita Bangsa
     """)
 
