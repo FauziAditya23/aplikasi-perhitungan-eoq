@@ -56,11 +56,11 @@ def calculate_orders_per_year(D, Q):
     return orders
 
 # --- Konfigurasi Halaman Streamlit ---
-st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="�")
+st.set_page_config(layout="wide", page_title="EOQ & Inventory Model Simulator", page_icon="📈")
 
 # --- Header Utama Aplikasi ---
 st.markdown("<h1 style='text-align: center; font-size: 3em;'>📦 Optimalisasi Manajemen Persediaan (EOQ & ROP)</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center; font-size: 1.8em;'>Studi Kasus: Kedai Kopi 'Kopi Kita' ☕</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center; font-size: 1.8em;'>Studi Kasus: Pabrik Tekstil 'Benang Emas' 🧵</h3>", unsafe_allow_html=True)
 
 st.markdown("""
 <div style="text-align: center; font-size: 1.1em;">
@@ -72,13 +72,39 @@ sambil memastikan ketersediaan stok yang memadai. Mari kita optimalkan rantai pa
 
 st.divider() # Garis pemisah visual
 
+# --- Studi Kasus 'Pabrik Tekstil Benang Emas' ---
+st.markdown("<h2>📖 Studi Kasus: Pabrik Tekstil 'Benang Emas'</h2>", unsafe_allow_html=True)
+st.markdown("""
+<div style="font-size: 1.1em; line-height: 1.6;">
+Pabrik Tekstil 'Benang Emas' adalah produsen kain terkemuka yang melayani pasar domestik dan ekspor.
+Mereka sangat bergantung pada pasokan benang katun berkualitas tinggi sebagai bahan baku utama.
+Efisiensi manajemen persediaan benang sangat krusial untuk menjaga kelancaran produksi dan menekan biaya operasional.
+
+Manajer Logistik 'Benang Emas' ingin mengoptimalkan biaya persediaan tahunan benang katun sambil memastikan
+bahwa produksi tidak terhambat karena kekurangan bahan baku. Mereka perlu menentukan berapa banyak benang katun
+yang harus dipesan setiap kali (EOQ) dan kapan harus melakukan pemesanan ulang (ROP).
+
+Berikut adalah asumsi data yang lebih realistis untuk 'Benang Emas' berdasarkan operasi tahunan yang besar:
+<ul>
+    <li><strong>Permintaan Tahunan (D):</strong> Pabrik ini membutuhkan sekitar 250.000 kg benang katun per tahun.</li>
+    <li><strong>Biaya Pemesanan (S):</strong> Setiap kali melakukan pemesanan, termasuk biaya administrasi, inspeksi kualitas, dan transportasi untuk pengiriman besar, diperkirakan mencapai Rp 10.000.000.</li>
+    <li><strong>Biaya Penyimpanan (H):</strong> Biaya untuk menyimpan 1 kg benang katun selama setahun (termasuk biaya gudang, asuransi, risiko kerusakan/penyusutan) diperkirakan Rp 30.000.</li>
+    <li><strong>Lead Time Pengiriman (Lead Time):</strong> Waktu yang dibutuhkan dari pemesanan hingga benang tiba di gudang adalah 7 hari.</li>
+    <li><strong>Stok Pengaman (Safety Stock):</strong> Untuk mengantisipasi fluktuasi permintaan produksi atau keterlambatan pengiriman dari pemasok, 'Benang Emas' menjaga stok pengaman sebesar 800 kg.</li>
+</ul>
+Mari kita gunakan simulator ini untuk membantu 'Benang Emas' menemukan kebijakan persediaan yang paling efisien!
+</div>
+""", unsafe_allow_html=True)
+
+st.divider() # Garis pemisah visual
+
 # --- Perhitungan Utama (Dilakukan di luar tombol agar nilai tersedia untuk input) ---
-# Nilai default diubah agar lebih realistis untuk perhitungan tahunan
-D_default = 150000
-S_default = 7500000 
-H_default = 25000 
-lead_time_default = 5 # Lead Time Pengiriman (hari) - Tetap
-safety_stock_default = 300 # Stok Pengaman (kg) - Lebih realistis
+# Nilai default diubah agar lebih realistis untuk perhitungan tahunan dengan biaya yang lebih besar (ratusan juta)
+D_default = 250000 # Permintaan Tahunan (kg) - Contoh: 250.000 kg benang katun per tahun
+S_default = 10000000 # Biaya Pemesanan per Pesanan (Rp) - Disesuaikan menjadi Rp 10.000.000
+H_default = 30000 # Biaya Penyimpanan per kg per Tahun (Rp) - Disesuaikan menjadi Rp 30.000 per kg per tahun
+lead_time_default = 7 # Lead Time Pengiriman (hari) - Disesuaikan untuk skenario industri
+safety_stock_default = 800 # Stok Pengaman (kg) - Disesuaikan untuk cakupan yang lebih besar
 
 # --- Kolom Panduan Aplikasi (di Sidebar) ---
 with st.sidebar:
@@ -128,7 +154,7 @@ with main_col_input:
     with st.container(border=True):
         st.markdown("<h4>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
         D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=D_default, help="Jumlah total unit barang yang dibutuhkan dalam setahun.")
-        S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=S_default, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
+        S = st.number_input("Biaya Pemesanan per Pesanan (Rp) �", min_value=0, value=S_default, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
         H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=H_default, help="Biaya untuk menyimpan satu kg barang selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
         
         st.markdown("---") # Pemisah dalam container
@@ -182,7 +208,7 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
     st.divider() # Garis pemisah visual sebelum hasil
 
     st.markdown("<h2>💡 Hasil dan Wawasan Bisnis</h2>", unsafe_allow_html=True)
-    st.success(f"**Kebijakan Optimal untuk 'Kopi Kita':** Pesan **{eoq:.0f} kg** biji kopi setiap kali stok mencapai **{rop:.1f} kg**.")
+    st.success(f"**Kebijakan Optimal untuk 'Benang Emas':** Pesan **{eoq:.0f} kg** benang katun setiap kali stok mencapai **{rop:.1f} kg**.")
     
     col_results1, col_results2 = st.columns(2)
     with col_results1:
