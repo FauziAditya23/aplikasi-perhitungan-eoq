@@ -124,9 +124,8 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("Tentang Saya:")
     st.markdown("""
-    **Nama:** Fauzi Aditya \n
-    **Kelas:** TI.24.C2 \n
-    **Prodi:** Teknik Informatika \n
+    **Nama:** Fauzi Aditya
+    **Prodi:** Teknik Informatika
     **Kampus:** Universitas Pelita Bangsa
     """)
 
