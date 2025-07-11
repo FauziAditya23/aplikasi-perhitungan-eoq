@@ -154,7 +154,7 @@ with main_col_input:
     with st.container(border=True):
         st.markdown("<h4>⚙️ Parameter Model Input</h4>", unsafe_allow_html=True)
         D = st.number_input("Permintaan Tahunan (kg) 📈", min_value=1, value=D_default, help="Jumlah total unit barang yang dibutuhkan dalam setahun.")
-        S = st.number_input("Biaya Pemesanan per Pesanan (Rp) �", min_value=0, value=S_default, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
+        S = st.number_input("Biaya Pemesanan per Pesanan (Rp) 💸", min_value=0, value=S_default, help="Biaya tetap untuk setiap kali melakukan pemesanan (misalnya biaya administrasi, pengiriman).")
         H = st.number_input("Biaya Penyimpanan per kg per Tahun (Rp) 🏦", min_value=0, value=H_default, help="Biaya untuk menyimpan satu kg barang selama setahun (misalnya biaya gudang, asuransi, kerusakan).")
         
         st.markdown("---") # Pemisah dalam container
@@ -228,7 +228,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
             elif eoq < (D/12):
                 st.info("- **Frekuensi Tinggi:** Pesanan dalam jumlah kecil tapi sering. Ini hemat biaya simpan, tapi boros biaya administrasi pemesanan.")
             else:
-                st.success("- **Kebijakan Seimbang:** Kuantitas pesanan Anda menyeimbangkan biaya pesan dan biaya simpan dengan baik.")
+                # Mengubah teks agar lebih eksplisit menyatakan "Frekuensi Seimbang"
+                st.success("- **Frekuensi Seimbang:** Kuantitas pesanan Anda menyeimbangkan biaya pesan dan biaya simpan dengan baik.")
         else:
             st.info("- Tidak ada analisis kebijakan yang tersedia karena EOQ tidak valid (biaya penyimpanan atau permintaan tahunan nol).")
     
