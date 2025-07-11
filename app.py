@@ -217,16 +217,21 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
 
     with st.container(border=True):
         st.markdown("<h4>📊 Analisis Kebijakan Persediaan</h4>", unsafe_allow_html=True)
-        if eoq > 0:
-            if eoq > (D/4):
-                st.warning("- **Frekuensi Rendah:** Pesanan dalam jumlah besar tapi jarang. Ini hemat biaya pesan, tapi boros biaya simpan.")
-            elif eoq < (D/12):
+        if eoq > 0 and np.isfinite(frekuensi_pesanan):
+            # Menggunakan frekuensi_pesanan untuk analisis kebijakan
+            if frekuensi_pesanan > 30: # Misalnya, lebih dari 30 pesanan per tahun
+                st.warning("- **Frekuensi Sangat Tinggi:** Pesanan dalam jumlah sangat kecil tapi sangat sering. Ini bisa meningkatkan biaya administrasi dan logistik secara signifikan.")
+            elif frekuensi_pesanan > 22: # Antara 22 dan 30 pesanan per tahun
                 st.info("- **Frekuensi Tinggi:** Pesanan dalam jumlah kecil tapi sering. Ini hemat biaya simpan, tapi boros biaya administrasi pemesanan.")
-            else:
-                # Mengubah teks agar lebih eksplisit menyatakan "Frekuensi Seimbang"
-                st.success("- **Frekuensi Seimbang:** Kuantitas pesanan Anda menyeimbangkan biaya pesan dan biaya simpan dengan baik.")
+            elif frekuensi_pesanan < 10: # Kurang dari 10 pesanan per tahun
+                st.warning("- **Frekuensi Sangat Rendah:** Pesanan dalam jumlah sangat besar tapi sangat jarang. Ini bisa meningkatkan biaya penyimpanan dan risiko kerusakan/kadaluarsa.")
+            elif frekuensi_pesanan < 15: # Antara 10 dan 15 pesanan per tahun
+                st.info("- **Frekuensi Rendah:** Pesanan dalam jumlah besar tapi jarang. Ini hemat biaya pesan, tapi boros biaya simpan.")
+            else: # Antara 15 dan 22 pesanan per tahun (termasuk 19.36 dengan default saat ini)
+                st.success("- **Frekuensi Seimbang:** Kuantitas pesanan Anda menyeimbangkan biaya pesan dan biaya simpan dengan optimal. Ini adalah kebijakan yang paling efisien.")
         else:
             st.info("- Tidak ada analisis kebijakan yang tersedia karena EOQ tidak valid (biaya penyimpanan atau permintaan tahunan nol).")
+    
     
     st.divider() # Garis pemisah visual
 
