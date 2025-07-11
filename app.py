@@ -122,12 +122,7 @@ with st.sidebar:
     st.info("Tips: Ubah parameter di setiap model untuk melihat bagaimana hasilnya berubah secara real-time!")
     
     st.markdown("---")
-    st.markdown("Tentang Saya:")
-    st.markdown("""
-    **Nama:** Fauzi Aditya
-    **Prodi:** Teknik Informatika
-    **Kampus:** Universitas Pelita Bangsa
-    """)
+    st.markdown("UAS Matematika Terapan")
 
 # --- Area Utama Aplikasi (Input, Penjelasan Rumus, dan Tombol) ---
 st.markdown("""
@@ -434,4 +429,4 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         """)
 
 st.markdown("---")
-st.markdown("UAS Matematika Terapan")
+st.markdown("Fauzi Aditya, Mahasiswa Teknik Informatika Universitas Pelita Bangsa")
