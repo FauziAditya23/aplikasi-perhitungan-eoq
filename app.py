@@ -124,9 +124,10 @@ with st.sidebar:
     st.markdown("---")
     st.markdown("<h4>Tentang Saya:</h4>")
     st.markdown("""
-    **Nama:** [Masukkan Nama Anda Di Sini]
-    **Kelas:** [Masukkan Kelas Anda Di Sini]
-    **Kampus:** [Masukkan Nama Kampus Anda Di Sini]
+    **Nama:** Fauzi Aditya
+    **Kelas:** TI.24.C2
+    **Prodi:** Teknik Informatika
+    **Kampus:** Universitas Pelita Bangsa
     """)
 
 # --- Area Utama Aplikasi (Input, Penjelasan Rumus, dan Tombol) ---
