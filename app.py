@@ -211,8 +211,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         st.metric(label="🎯 Titik Pemesanan Ulang (ROP)", value=f"{rop:.1f} kg")
     with col_results2:
         st.metric(label="💰 Total Biaya Persediaan Tahunan", value=f"Rp {total_biaya:,.0f}")
-        # Perubahan di sini: menambahkan frekuensi pemesanan per tahun
-        st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.1f} hari ({frekuensi_pesanan:.0f}x per tahun)")
+        # Perubahan di sini: membulatkan siklus_pemesanan dan frekuensi_pesanan
+        st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.0f} hari ({frekuensi_pesanan:.0f}x per tahun)")
 
     st.divider() # Garis pemisah visual
 
@@ -336,8 +336,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
                 \text{{Frekuensi Pemesanan per Tahun}} = \frac{{{D}}}{{{eoq:,.2f}}} = {frekuensi_pesanan:,.2f} \text{{ kali}}
             ''')
             st.markdown(f"""
-            Dibulatkan menjadi **{frekuensi_pesanan:.0f} kali** per tahun.
-            """)
+            <div style="text-align: center;">Dibulatkan menjadi <strong>{frekuensi_pesanan:.0f} kali</strong> per tahun.</div>
+            """, unsafe_allow_html=True)
         else:
             st.write("Frekuensi pemesanan tak terhingga karena EOQ adalah nol.")
 
@@ -349,8 +349,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
                 \text{{Siklus Pemesanan (Hari)}} = \frac{{360}}{{{frekuensi_pesanan:,.2f}}} = {siklus_pemesanan:,.2f} \text{{ hari}}
             ''')
             st.markdown(f"""
-            Dibulatkan menjadi **{siklus_pemesanan:.0f} hari**.
-            """)
+            <div style="text-align: center;">Dibulatkan menjadi <strong>{siklus_pemesanan:.0f} hari</strong>.</div>
+            """, unsafe_allow_html=True)
         else:
             st.write("Siklus pemesanan tak terhingga karena frekuensi pemesanan adalah nol.")
 
