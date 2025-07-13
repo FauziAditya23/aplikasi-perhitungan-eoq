@@ -146,7 +146,7 @@ def model_persediaan():
             st.markdown("**Rumus Pendukung:**")
             st.latex(r'''\text{Rata-rata Permintaan Harian} = \frac{\text{Permintaan Tahunan}}{365}''')
             st.latex(r'''\text{Z-score} = \text{Nilai dari distribusi normal standar (berdasarkan Tingkat Layanan)}''')
-            st.latex(r'''\text{Safety Stock} = Z\text{-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}''')
+            st.latex(r'''\text{Safety Stock} = \text{Z-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}''') # FIX: Changed Z\text{-score} to \text{Z-score}
             st.latex(r'''ROP = (\text{Rata-rata Permintaan Harian} \times \text{Waktu Tunggu}) + \text{Safety Stock}''')
             st.latex(r''' TC = \left(\frac{D}{Q}\right)S + \left(\frac{Q}{2}\right)H ''')
 
@@ -348,11 +348,11 @@ def model_persediaan():
         st.markdown(f"Untuk tingkat layanan {service_level_percent}%, Z-score adalah sekitar {z_score:,.2f}.")
         st.latex(fr'''\text{{Z-score}} = {z_score:,.2f}''')
         st.latex(r'''
-            \text{Safety Stock} = Z\text{-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}
+            \text{Safety Stock} = \text{Z-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}
         ''')
         st.markdown(f"""
         Di mana:
-        * $Z\text{-score}$ = {z_score:,.2f}
+        * $\text{{Z-score}}$ = {z_score:,.2f}
         * $\text{{Std Dev Permintaan Harian}}$ = {std_dev_daily_demand:,.2f} unit
         * $\text{{Waktu Tunggu}}$ = {lead_time_days} hari
         """)
