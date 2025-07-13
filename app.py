@@ -90,7 +90,7 @@ Berikut adalah asumsi data yang lebih realistis untuk 'Benang Emas' berdasarkan 
     <li><strong>Biaya Pemesanan (S):</strong> Setiap kali melakukan pemesanan, termasuk biaya administrasi, inspeksi kualitas, dan transportasi untuk pengiriman besar, diperkirakan mencapai Rp 10.000.000.</li>
     <li><strong>Biaya Penyimpanan (H):</strong> Biaya untuk menyimpan 1 kg benang katun selama setahun (termasuk biaya gudang, asuransi, risiko kerusakan/penyusutan) diperkirakan Rp 30.000.</li>
     <li><strong>Lead Time Pengiriman (Lead Time):</strong> Waktu yang dibutuhkan dari pemesanan hingga benang tiba di gudang adalah 7 hari.</li>
-    <li><strong>Stok Pengaman (Safety Stock):</strong> Untuk mengantisipasi fluktuasi permintaan produksi atau keterlambatan pengiriman dari pemasok, 'Benang Emas' menjaga stok pengaman sebesar 800 kg.</li>
+    <li><strong>Stok Pengaman (Safety Stock):</strong> Untuk mengantisipasi fluktuasi permintaan produksi atau keterlambatan pengiriman dari pemasok, 'Benang Emas' menjaga stok pengaman sebesar 500 kg.</li>
 </ul>
 Mari kita gunakan simulator ini untuk membantu 'Benang Emas' menemukan kebijakan persediaan yang paling efisien!
 </div>
