@@ -211,8 +211,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         st.metric(label="🎯 Titik Pemesanan Ulang (ROP)", value=f"{rop:.1f} kg")
     with col_results2:
         st.metric(label="💰 Total Biaya Persediaan Tahunan", value=f"Rp {total_biaya:,.0f}")
-        # MODIFIKASI DI SINI: Mengubah siklus_pemesanan menjadi bilangan bulat
-        st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.0f} hari ({frekuensi_pesanan:.0f}x pertahun)")
+        # Perubahan di sini: menambahkan frekuensi pemesanan per tahun
+        st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.1f} hari ({frekuensi_pesanan:.0f}x per tahun)")
 
     st.divider() # Garis pemisah visual
 
@@ -321,6 +321,39 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
             ''')
         else:
             st.write("Perhitungan biaya tidak dapat ditampilkan karena EOQ tak terhingga atau tidak valid.")
+
+        st.markdown("#### 4. Perhitungan Siklus Pemesanan dan Frekuensi Pemesanan")
+        st.latex(r'''
+            \text{Frekuensi Pemesanan per Tahun} = \frac{\text{Permintaan Tahunan (D)}}{\text{Kuantitas Pesanan Optimal (EOQ)}}
+        ''')
+        st.markdown(f"""
+        Di mana:
+        * Permintaan Tahunan ($D$) = {D} kg
+        * Kuantitas Pesanan Optimal (EOQ) = {eoq:,.2f} kg
+        """)
+        if eoq > 0:
+            st.latex(fr'''
+                \text{{Frekuensi Pemesanan per Tahun}} = \frac{{{D}}}{{{eoq:,.2f}}} = {frekuensi_pesanan:,.2f} \text{{ kali}}
+            ''')
+            st.markdown(f"""
+            Dibulatkan menjadi **{frekuensi_pesanan:.0f} kali** per tahun.
+            """)
+        else:
+            st.write("Frekuensi pemesanan tak terhingga karena EOQ adalah nol.")
+
+        st.latex(r'''
+            \text{Siklus Pemesanan (Hari)} = \frac{360}{\text{Frekuensi Pemesanan per Tahun}}
+        ''')
+        if frekuensi_pesanan > 0:
+            st.latex(fr'''
+                \text{{Siklus Pemesanan (Hari)}} = \frac{{360}}{{{frekuensi_pesanan:,.2f}}} = {siklus_pemesanan:,.2f} \text{{ hari}}
+            ''')
+            st.markdown(f"""
+            Dibulatkan menjadi **{siklus_pemesanan:.0f} hari**.
+            """)
+        else:
+            st.write("Siklus pemesanan tak terhingga karena frekuensi pemesanan adalah nol.")
+
 
     st.divider() # Garis pemisah visual
 
