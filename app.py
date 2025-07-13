@@ -88,8 +88,7 @@ with st.sidebar:
     st.header("Panduan Aplikasi")
     st.markdown("""
     Aplikasi ini mendemonstrasikan model matematika kunci dalam skenario bisnis di dunia nyata.
-    Tab yang tersedia menyediakan **analisis, visualisasi, dan wawasan bisnis** yang dapat ditindaklanjuti.
-    """)
+    """) # Removed "Tab yang tersedia" as there's only one tab now.
     st.info("**Tips:** Ubah parameter di model untuk melihat bagaimana hasilnya berubah secara real-time!")
     
     st.markdown("""
@@ -146,7 +145,7 @@ def model_persediaan():
             st.markdown("**Rumus Pendukung:**")
             st.latex(r'''\text{Rata-rata Permintaan Harian} = \frac{\text{Permintaan Tahunan}}{365}''')
             st.latex(r'''\text{Z-score} = \text{Nilai dari distribusi normal standar (berdasarkan Tingkat Layanan)}''')
-            st.latex(r'''\text{Safety Stock} = \text{Z-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}''') # FIX: Changed Z\text{-score} to \text{Z-score}
+            st.latex(r'''\text{Safety Stock} = \text{Z-score} \times \text{Std Dev Permintaan Harian} \times \sqrt{\text{Waktu Tunggu (hari)}}''')
             st.latex(r'''ROP = (\text{Rata-rata Permintaan Harian} \times \text{Waktu Tunggu}) + \text{Safety Stock}''')
             st.latex(r''' TC = \left(\frac{D}{Q}\right)S + \left(\frac{Q}{2}\right)H ''')
 
