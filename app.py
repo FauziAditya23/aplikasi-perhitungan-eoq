@@ -211,7 +211,8 @@ if st.button("✨ Hitung Optimalisasi Persediaan", type="primary", use_container
         st.metric(label="🎯 Titik Pemesanan Ulang (ROP)", value=f"{rop:.1f} kg")
     with col_results2:
         st.metric(label="💰 Total Biaya Persediaan Tahunan", value=f"Rp {total_biaya:,.0f}")
-        st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.1f} hari")
+        # MODIFIKASI DI SINI: Menambahkan frekuensi pesanan per tahun
+        st.metric(label="🔄 Siklus Pemesanan", value=f"~{siklus_pemesanan:.1f} hari ({frekuensi_pesanan:.0f}x pertahun)")
 
     st.divider() # Garis pemisah visual
 
